@@ -672,7 +672,7 @@ function showImgage(e) {
         var inputFile = inputFiles[0];
         var reader = new FileReader();
         reader.onload = function(event) {
-            var bodyImg = $('.image-post');
+            var bodyImg = $('.image-modal-post');
             bodyImg.find('img').attr("src", event.target.result);
             if(bodyImg.hasClass('d-none')){
                 bodyImg.removeClass('d-none');
