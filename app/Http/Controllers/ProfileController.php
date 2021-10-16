@@ -63,7 +63,6 @@ class ProfileController extends Controller
                         ->with('city')
                         ->with('city.country')
                         ->first();
-        // return response()->json(['profile' => $profile]);
         return view('edit-profile',['profile'=>$profile,'countrys' => $countrys]);
     }
     public function update(Request $request){
@@ -101,9 +100,7 @@ class ProfileController extends Controller
             $messages['password.confirmed'] = "Les mots de passes doivent etre identique!";
             $update['password'] = Hash::make($request->password);
         }
-
         $validate = Validator::make($request->all(),$regles,$messages);
-
         if($validate->fails()){
             return redirect()->back()->withErrors($validate)->withInput();
         }

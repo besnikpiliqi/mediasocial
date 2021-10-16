@@ -39,7 +39,6 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-primary vote-post">{{ __('Voter') }}</button>
       </div>
-      
     </div>
   </div>
 </div>
@@ -158,6 +157,31 @@
         <button type="submit" class="btn btn-primary update-post">{{ __('Modifier') }}</button>
       </div>
       {!! Form::close() !!}
+    </div>
+  </div>
+</div>
+<!-- search users -->
+<div class="modal fade" id="modalsearchuser" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabelabonnes" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title abonnes" id="staticBackdropLabelabonnes">{{ __('Chercher') }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <div class="input-group mb-3">
+        <input type="text" class="form-control searche" placeholder="{{ __('Entre un nom') }}" aria-label="{{ __('Entre un nom') }}" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="button" onclick="searche();">{{ __('Chercher') }}</button>
+        </div>
+      </div>
+      <div class="body-searche-user d-100">
+        <div class='text-center'>{{ __('Chercher un nom!') }}</div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary abonnes" data-bs-dismiss="modal">{{ __('Fermer') }}</button>
+      </div>
     </div>
   </div>
 </div>

@@ -54,6 +54,19 @@ class HomeController extends Controller
         // return response()->json(['posts' => $posts]);
         return view('home', ["posts" => $posts]);
     }
+    public function prov(){
+        $prov = User::search(['name', 'email'],'le')->get();
+        return response()->json($prov);
+    }
+    public function searcheUser(Request $request){
+        $searche = preg_replace("/[^A-Za-z0-9 ]/", '', $request->get('searche'));
+        $searche = explode(' ',$searche);
+        // if(!strlen($searche)){
+        //     return response()->json();
+        // }
+        $searched = Post::whereLikeWith(['comments.content','content'], $request->get('searche') )->get();
+        return response()->json($searched);
+    }
     
 
     public function checkVotePost($post_id){
@@ -85,16 +98,16 @@ class HomeController extends Controller
                 'user_id'=>auth()->id(),
                 'post_id'=>$comment_post_id,
                 'comment_id'=>$request->get('comment_id'),
-                'stars'=>$request->get('vote')
-            ]);
+                'stars'=>$request->get('vote')]);
         }
         return response()->json($votePost);
     }
     public function newPost(Request $request){
-        
         $validate = Validator::make($request->all(),
         ['content' => ['required', 'max:255'],'file' => 'mimes:jpeg,jpg,png',],
-        ['content.required'=>"C'est obligé",'content.max'=>"Le contenu est au maximum 255 lettre",'file.mimes'=>"La photo doit etre en format JPEG,JPG,PNG"]);
+        ['content.required'=>"C'est obligé",
+        'content.max'=>"Le contenu est au maximum 255 lettre",
+        'file.mimes'=>"La photo doit etre en format JPEG,JPG,PNG"]);
 
         if($validate->fails()){
             return response()->json(['error'=>$validate->messages()]);
@@ -105,25 +118,29 @@ class HomeController extends Controller
         }
         $post->user_id = auth()->id();
         $post->content = $request->content;
-       return response()->json(['success'=>$post->save()]);
-        
-        
+        return response()->json(['success'=>$post->save()]);
     }
     public function editPost(Request $request,Post $post){
         if (!Gate::allows('update-post', $post)) {
             return response()->json(['success'=>0]);
         }
-        $validate = Validator::make($request->all(),
-        ['content' => ['required', 'max:255'],'file' => 'mimes:jpeg,jpg,png',],
-        ['content.required'=>"C'est obligé",
-        'content.max'=>"Le contenu est au maximum 255 lettre",
-        'file.mimes'=>"La photo doit etre en format JPEG,JPG,PNG"]);
+        $validate = Validator::make(
+            $request->all(),
+            [
+                'content' => ['required', 'max:255'],
+                'file' => 'mimes:jpeg,jpg,png'
+            ],
+            [
+                'content.required'=>"C'est obligé",
+                'content.max'=>"Le contenu est au maximum 255 lettre",
+                'file.mimes'=>"La photo doit etre en format JPEG,JPG,PNG"]
+        );
 
         if($validate->fails()){
             return response()->json(['error'=>$validate->messages()]);
         }
         if($request->hasFile('file')){
-            $path = public_path().'/storage/posts/'.$post->photo;
+            $path = public_path().'/storage/'.$post->photo;
             File::delete($path);
             $post->photo = $request->file('file')->store('posts/', ['disk' => 'public']);
         }

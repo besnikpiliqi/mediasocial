@@ -25,7 +25,9 @@ Route::group(['middleware'=> ['auth','verified'] ],function(){
     Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
     Route::get('/logout', [App\Http\Controllers\HomeController::class, 'logout'])->name('logout');
+    Route::get('/searche', [App\Http\Controllers\HomeController::class, 'searcheUser'])->name('searche');
     
+    Route::get('/prov', [App\Http\Controllers\HomeController::class, 'prov']);
 
     Route::get('/profile/{id?}', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
 

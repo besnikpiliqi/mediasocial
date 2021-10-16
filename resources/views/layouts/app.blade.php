@@ -25,7 +25,7 @@
 </head>
 <body>
     <script>
-        var user = <?php if(auth()->check()){ echo auth()->user()->toJson();} ?>;
+        var user_id = <?php if(auth()->check()){ echo json_decode(auth()->id());} ?>;
     </script>
     <nav class="navbar navbar-light bg-light fixed-top border-bottom">
         <div class="container-fluid">
@@ -60,6 +60,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('logout') }}">{{ __('Déconnexion') }}</a>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <button  type="button" class="btn btn-secondary"  data-bs-toggle="modal" data-bs-target="#modalsearchuser" >{{ __('Chercher') }}</button>
                     </li>
                     
                 </div>

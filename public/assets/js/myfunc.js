@@ -162,7 +162,7 @@ function putModalComments (data) {
                     '<div class="col-7">'+
                         '<h5 class="card-title name-profile" style="height:100%;"><a href="/profile/'+comment.user.id+'">'+comment.user.name+'</a></h5>'+
                     '</div>'+
-                    (comment.user.id == user.id ? 
+                    (comment.user.id == user_id ? 
                     '<div class="col-3">'+
                         '<button type="button" class="btn" onclick="removeComment('+comment.id+')"><i class="bi bi-trash"></i></button>'+
                         '</div>' : 
@@ -195,7 +195,7 @@ function putModalComments (data) {
 }
 function checkIfVoted(likes) {
     for (let i = 0; i < likes.length; i++) {
-        if(likes[i].user_id == user.id){
+        if(likes[i].user_id == user_id){
             return true;
         }
         
@@ -389,7 +389,7 @@ function following(id){
         success: function(data) {
             if(data.length){
                 for (var i = 0; i < data.length; i++) {
-                    // var if_follow = (data[i].user_id == user.id ?? true); // this is to know if this user i have make follow or not
+                    // var if_follow = (data[i].user_id == user_id ?? true); // this is to know if this user i have make follow or not
                     content += '<div class="row pb-3"><div class="col-8 name-profile"><a href="/profile/'+data[i].follow_id+'" class="">'+data[i].user_following.name+'</a></div>';
                     content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].user_following.photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
                     // if(if_follow){
@@ -410,7 +410,40 @@ function following(id){
 
     });
 }
+function searche(){
 
+    var body = $('.body-searche-user');
+    var _token = $('meta[name="csrf-token"]').attr('content');
+    var content = "";
+    $.ajax({
+        url: '/searche',
+        dataType : 'json',
+        type:'get',
+        headers: {'X-CSRF-TOKEN': _token},
+        data:{ searche : $('input.searche').val() },
+        beforeSend : function(){
+            body.html('<div class="d-100 text-center">Loading...</div>');
+        },
+        success: function(data) {
+            console.log(data);
+            if(data.length){
+                for (var i = 0; i < data.length; i++) {
+                    content += '<div class="row pb-3">';
+                    content += '<div class="col-8 name-profile"><a href="/profile/'+data[i].id+'" class="">'+data[i].name+'</a></div>';
+                    content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].photoProfile+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
+                    content += '</div>';
+                }
+                body.html(content);
+            }else{
+                body.html("<div class='col-12 text-center'>N'existe pas aucun utilisateur avec ce nom!</div>"); 
+            }
+        },
+        error : function(data){
+            body.html('<div class="col-12 text-center">Il y avait un problème!</div>');
+        },
+
+    });
+}
 function followed(id){
     $('.modal-title.abonnes').html("Abonnées");
     var body = $('.modal-body.abonnes');
@@ -427,7 +460,7 @@ function followed(id){
         success: function(data) {
             if(data.length){
                 for (var i = 0; i < data.length; i++) {
-                    // var if_follow = (data[i].follow_id == user.id ?? true); // this is to know if this user i have make follow or not
+                    // var if_follow = (data[i].follow_id == user_id ?? true); // this is to know if this user i have make follow or not
                     content += '<div class="row pb-3"><div class="col-8 name-profile"><a href="/profile/'+data[i].user_id+'" class="">'+data[i].user_followed.name+'</a></div>';
                     content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].user_followed.photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
                     // if(if_follow){

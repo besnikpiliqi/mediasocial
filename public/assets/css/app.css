@@ -26,7 +26,11 @@ label.new-post, label.edit-post{
 label.new-post:hover, label.edit-post:hover{
     cursor: pointer;
 }
-
+.body-searche-user{
+    max-height: 250px;
+    overflow: hidden;
+    overflow-y: auto;
+}
 .file-edit-profile, input.edit-post, input.new-post{
     display: none;
 }

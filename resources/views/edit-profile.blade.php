@@ -129,7 +129,7 @@
                         <div class="form-group row p-2 mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
-                                    {{ __('Modifiko') }}
+                                    {{ __('Modifier') }}
                                 </button>
                             </div>
                         </div>

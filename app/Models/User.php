@@ -60,6 +60,20 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(Comment::class, Post::class)->orderBy('created_at', 'DESC');
     }
+    public function scopeWhereLike($query, $column, $value)
+    {
+        return $query->where($column, 'like', '%'.preg_replace("/[^A-Za-z0-9 ]/", '', $value).'%');
+    }
+    public function scopeOrWhereLike($query, $column, $value)
+    {   
+        $value = preg_replace("/[^A-Za-z0-9 ]/", '', $value);
+        return $query->orWhere($column, 'like', '%'.$value.'%');
+        // $explodes = explode(" ", $value);
+        // foreach($explodes as $explode){
+        //     $request->orWhere($column, 'like', '%'.$explode.'%');
+        // }
+        // return $request;
+    }
 
 
     /**

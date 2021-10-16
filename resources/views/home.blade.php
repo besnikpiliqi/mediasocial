@@ -5,7 +5,7 @@
     <div class="card mb-3 w-75">
         <div class="card-body">
           <div class="row">
-            <div class="col-sm-6 col-md-6">{{ __('Actualiés') }}</div>
+            <div class="col-sm-6 col-md-6">{{ __('Actualités') }}</div>
             <div class="col-6 col-md-6 d-flex flex-row-reverse">
               <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalmakecomment">
                 {{ __('Créér un post') }}
@@ -39,7 +39,6 @@
                 <p class="card-text content">{{ $post->content }}</p>
                 <p class="card-text"><small class="text-muted">{{ $post->cree_at }}</small></p>
             </div>
-            
             <div class="card-body photo-post @if(!$post->photo) {{ __('d-none') }} @endif">
               <img src="{{ asset('storage/'.$post->photo) }}" class="card-img-bottom">
             </div>
