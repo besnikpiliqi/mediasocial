@@ -8,23 +8,6 @@ var idLoaded = 0,
     
 $( document ).ready(function() {
 
-    
-    
-    // $('.star').on('click', function(){
-    //     $('.selected').each(function(){
-    //         $(this).removeClass('selected');
-    //     });
-    //     var stars = $(this).attr('data-star');
-
-    //     if($(this).parent().parent().hasClass('vote-comment')){
-    //         bodyCommentStars.find('input.vote-stars-comment').val(stars);
-    //     }else{
-    //         bodyPostStars.find('input.vote-stars-post').val(stars);
-    //     }
-    //     $(this).addClass('selected');
-    // });
-
-    
     $(".vote-comment").click(function(e){
         e.preventDefault();
         var vote = Number(bodyCommentStars.find('.vote-stars-comment').val());
@@ -139,17 +122,16 @@ function comments(post_id){
     });
 }; 
 
-
+var result;
 function putModalComments (data) {
     
     var content = "";
     if($.isEmptyObject(data)){
         bodyComment.html('<div class="loading-comments">Il y avait un problème!</div>');
     }else{
-        if(data.comments.length){
-            for(i = 0;i < data.comments.length;i++){
-                var comment = data.comments[i];
-                var avgLikes = avgComment(comment.likes);
+        if(data[0].comments.length){
+            for(i = 0;i < data[0].comments.length;i++){
+                var comment = data[0].comments[i];
                 content += '<div class="row d-flex justify-content-center">'+
                 '<div class="card mb-3 w-75" id="comment-'+comment.id+'">'+
                     '<div class="card-body">'+
@@ -160,10 +142,10 @@ function putModalComments (data) {
                         '</div>'+
                     '</div>'+
                     '<div class="col-7">'+
-                        '<h5 class="card-title name-profile" style="height:100%;"><a href="/profile/'+comment.user.id+'">'+comment.user.name+'</a></h5>'+
+                        '<h5 class="card-title name-profile" style="height:100%;"><a href="/profile/'+comment.user.username+'">'+comment.user.name+'</a></h5>'+
                     '</div>'+
-                    (comment.user.id == user_id ? 
-                    '<div class="col-3">'+
+                    (comment.is_commented ? 
+                    '<div class="col-3 d-flex justify-content-end">'+
                         '<button type="button" class="btn" onclick="removeComment('+comment.id+')"><i class="bi bi-trash"></i></button>'+
                         '</div>' : 
                     '')+
@@ -173,15 +155,15 @@ function putModalComments (data) {
                     '</div>'+
                     '<div class="card-body border-top" id="btn-vote-comment-'+comment.id+'">'+
                         '<button type="button" class="btn btn-primary btn-sm" onclick="starsComment('+comment.id+')" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal" data-bs-dismiss="modal">'+
-                            '<span class="badge bg-secondary">'+avgLikes+'</span>'+
-                            '<span class="fa fa-star" style="'+(avgLikes >= 1 ? 'color:orange' : '')+'"></span>'+
-                            '<span class="fa fa-star" style="'+(avgLikes >= 2 ? 'color:orange' : '')+'"></span>'+
-                            '<span class="fa fa-star" style="'+(avgLikes >= 3 ? 'color:orange' : '')+'"></span>'+
-                            '<span class="fa fa-star" style="'+(avgLikes >= 4 ? 'color:orange' : '')+'"></span>'+
-                            '<span class="fa fa-star" style="'+(avgLikes == 5 ? 'color:orange' : '')+'"></span> Votes'+ 
+                            '<span class="badge bg-secondary">'+comment.avg_votes+'</span>'+
+                            '<span class="fa fa-star" style="'+(comment.avg_votes >= 1 ? 'color:orange' : '')+'"></span>'+
+                            '<span class="fa fa-star" style="'+(comment.avg_votes >= 2 ? 'color:orange' : '')+'"></span>'+
+                            '<span class="fa fa-star" style="'+(comment.avg_votes >= 3 ? 'color:orange' : '')+'"></span>'+
+                            '<span class="fa fa-star" style="'+(comment.avg_votes >= 4 ? 'color:orange' : '')+'"></span>'+
+                            '<span class="fa fa-star" style="'+(comment.avg_votes == 5 ? 'color:orange' : '')+'"></span> Votes'+ 
                             '<span class="badge bg-secondary">'+comment.likes_count+'</span>'+
                         '</button>'+
-                        '<span class="btn-voted" style="color: gray;font-weight: bold;font-size: 12px;margin-left: 5px;">'+(checkIfVoted(comment.likes) ? 'Voted' : '')+'</span>'+
+                        '<span class="btn-voted" style="color: gray;font-weight: bold;font-size: 12px;margin-left: 5px;">'+(comment.is_voted ? 'Voted' : '')+'</span>'+
                     '</div>'+
                 '</div>'+
             '</div>';
@@ -193,27 +175,18 @@ function putModalComments (data) {
     }
 
 }
-function checkIfVoted(likes) {
-    for (let i = 0; i < likes.length; i++) {
-        if(likes[i].user_id == user_id){
-            return true;
-        }
-        
-    }
-    return false;
-}
+
 function stars(cette){
     $('.selected').removeClass('selected');
     
-        var stars = $(cette).attr('data-star');
+    var stars = $(cette).attr('data-star');
 
-        if($(cette).parent().parent().hasClass('comments-stars')){
-            bodyCommentStars.find('input.vote-stars-comment').val(stars);
-        }else{
-            bodyPostStars.find('input.vote-stars-post').val(stars);
-        }
-        $(cette).addClass('selected');
-    
+    if($(cette).parent().parent().hasClass('comments-stars')){
+        bodyCommentStars.find('input.vote-stars-comment').val(stars);
+    }else{
+        bodyPostStars.find('input.vote-stars-post').val(stars);
+    }
+    $(cette).addClass('selected');
 }
 function editPost(post_id) {
     var bodyPost = $('#post-'+post_id);
@@ -390,7 +363,7 @@ function following(id){
             if(data.length){
                 for (var i = 0; i < data.length; i++) {
                     // var if_follow = (data[i].user_id == user_id ?? true); // this is to know if this user i have make follow or not
-                    content += '<div class="row pb-3"><div class="col-8 name-profile"><a href="/profile/'+data[i].follow_id+'" class="">'+data[i].user_following.name+'</a></div>';
+                    content += '<div class="row pb-3"><div class="col-8 name-profile"><a href="/profile/'+data[i].user_following.username+'" class="">'+data[i].user_following.name+'</a></div>';
                     content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].user_following.photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
                     // if(if_follow){
                     //     content += '<div class="col-4 d-flex justify-content-end"><button type="button" class="btn btn-primary btn-sm" onclick="unfollow(this,'+data[i].follow_id+')">Abonné</button></div>';
@@ -411,7 +384,6 @@ function following(id){
     });
 }
 function searche(){
-
     var body = $('.body-searche-user');
     var _token = $('meta[name="csrf-token"]').attr('content');
     var content = "";
@@ -429,8 +401,8 @@ function searche(){
             if(data.length){
                 for (var i = 0; i < data.length; i++) {
                     content += '<div class="row pb-3">';
-                    content += '<div class="col-8 name-profile"><a href="/profile/'+data[i].id+'" class="">'+data[i].name+'</a></div>';
-                    content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].photoProfile+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
+                    content += '<div class="col-8 name-profile"><a href="/profile/'+data[i].username+'" class="">'+data[i].name+'</a></div>';
+                    content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
                     content += '</div>';
                 }
                 body.html(content);
@@ -441,7 +413,6 @@ function searche(){
         error : function(data){
             body.html('<div class="col-12 text-center">Il y avait un problème!</div>');
         },
-
     });
 }
 function followed(id){
@@ -458,10 +429,11 @@ function followed(id){
             body.html('<div class="col-12 text-center">Loading...</div>');
         },
         success: function(data) {
+            console.log(data)
             if(data.length){
                 for (var i = 0; i < data.length; i++) {
                     // var if_follow = (data[i].follow_id == user_id ?? true); // this is to know if this user i have make follow or not
-                    content += '<div class="row pb-3"><div class="col-8 name-profile"><a href="/profile/'+data[i].user_id+'" class="">'+data[i].user_followed.name+'</a></div>';
+                    content += '<div class="row pb-3"><div class="col-8 name-profile"><a href="/profile/'+data[i].user_followed.username+'" class="">'+data[i].user_followed.name+'</a></div>';
                     content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].user_followed.photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
                     // if(if_follow){
                     //     content += '<div class="col-4 d-flex justify-content-end"><button type="button" class="btn btn-primary btn-sm" onclick="unfollow(this,'+data[i].user_id+')">Abonné</button></div>';
@@ -608,19 +580,14 @@ function starsPost(post_id){
                                     '<li class="star '+(data.stars == 2 ? 'selected': '')+'" onclick="stars(this)" data-star="2"></li>'+
                                     '<li class="star '+(data.stars == 1 ? 'selected': '')+'" onclick="stars(this)" data-star="1"></li>'+
                                 '</ul>';
-                            
-                bodyVote.html(content);
+                 bodyVote.html(content);
                 bodyPostStars.next().find('.vote-post').html('Voted');
             }
         },
         error : function(data){
             alert('Il y avait un problème!');
         },
-
     });
-
-    
-    console.log(post_id)
 }
 
 function starsComment(comment_id){

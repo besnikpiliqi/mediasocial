@@ -29,7 +29,7 @@ Route::group(['middleware'=> ['auth','verified'] ],function(){
     
     Route::get('/prov', [App\Http\Controllers\HomeController::class, 'prov']);
 
-    Route::get('/profile/{id?}', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
+    Route::get('/profile/{username?}', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
 
     Route::get('/edit-profile', [App\Http\Controllers\ProfileController::class, 'edit'])->middleware('password.confirm')->name('edit-profile');
     Route::post('/edit-profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('edit-profile');
@@ -44,8 +44,8 @@ Route::group(['middleware'=> ['auth','verified'] ],function(){
     Route::get('/check-vote-comment/{comment}', [App\Http\Controllers\HomeController::class, 'checkVoteComment'])->name('check-vote-comment');
     Route::post('/delete-post/{post}', [App\Http\Controllers\HomeController::class, 'deletePost'])->name('delete-post');
     Route::post('/delete-comment/{comment}', [App\Http\Controllers\HomeController::class, 'deleteComent'])->name('delete-comment');
-    Route::get('/following/{follow_id}', [App\Http\Controllers\ProfileController::class, 'following'])->name('following');
-    Route::get('/followed/{follow_id}', [App\Http\Controllers\ProfileController::class, 'followed'])->name('followed');
+    Route::get('/following/{username}', [App\Http\Controllers\ProfileController::class, 'following'])->name('following');
+    Route::get('/followed/{username}', [App\Http\Controllers\ProfileController::class, 'followed'])->name('followed');
     Route::post('/unfollow', [App\Http\Controllers\ProfileController::class, 'unfollow'])->name('unfollow');
     Route::post('/follow', [App\Http\Controllers\ProfileController::class, 'follow'])->name('follow');
     Route::post('/cancelfollow', [App\Http\Controllers\ProfileController::class, 'cancelfollow'])->name('cancelfollow');

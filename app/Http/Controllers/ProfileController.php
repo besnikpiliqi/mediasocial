@@ -28,12 +28,13 @@ class ProfileController extends Controller
         // $this->middleware('auth');
     }
 
-    public function index($id = null)
+    public function index($username = null)
     {
-        if(!$id){
-           $user = auth()->user(); 
+        
+        if(!$username){
+            $user = auth()->user(); 
         }else{
-            $user = User::findOrFail($id);
+            $user = User::where('username', '=', $username)->firstOrFail();
         }
         
         $profile = $user->withCount('following')
@@ -49,7 +50,7 @@ class ProfileController extends Controller
         ->withCount('comments')
         ->with('likes')
         ->withCount('likes')
-        ->paginate(5))->map(function($data,$index){
+        ->paginate(5))->map(function($data){
              $data->cree_at = MyFunc::timeDifferent($data->created_at);
              return $data;
         });
@@ -88,10 +89,10 @@ class ProfileController extends Controller
         if($request->hasFile('file')){
             if(auth()->user()->photo != 'profile/profilDefault.jpg'){
                 // si la photo n'est pas par default alors on supprime la photo avant de mettre une nouvelle photo
-                $path = public_path().'/storage/'.auth()->user()->photo;
+                $path = public_path().auth()->user()->photo;
                 File::delete($path);
             }
-            $update['photo'] = $request->file('file')->store('profile/', ['disk' => 'public']);
+            $update['photo'] = '/storage/'.$request->file('file')->store('profile/', ['disk' => 'public']);
         }
         if($request->filled('password')){
             $regles['password'] = ['string', 'min:8', 'confirmed'];

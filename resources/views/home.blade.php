@@ -21,7 +21,7 @@
                 <div class="card-title body-profile">
                     <div class="row">
                         <div class="col-md-1 col-sm-2 img-profile">
-                            <img src="{{ asset('storage/'.$post->user->photo) }}">
+                            <img src="{{ asset($post->user->photo) }}">
                         </div>
                         <div class="col-md-7 col-sm-6">
                             <span class="card-title name-profile">{{ $post->user->name }}</span>
@@ -40,7 +40,7 @@
                 <p class="card-text"><small class="text-muted">{{ $post->cree_at }}</small></p>
             </div>
             <div class="card-body photo-post @if(!$post->photo) {{ __('d-none') }} @endif">
-              <img src="{{ asset('storage/'.$post->photo) }}" class="card-img-bottom">
+              <img src="{{ asset($post->photo) }}" class="card-img-bottom">
             </div>
             <div class="card-body border-top">
                 <div class="row">

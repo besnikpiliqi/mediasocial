@@ -56,7 +56,7 @@ class AppServiceProvider extends ServiceProvider
         // me relatione
         // kjo i merr krejt postimet sipas emrit username email qe shkruhet en input dmth i gjen postimet e personit qe kerkohet
         // kjo merr edhe tjera sene ne baz nevojes
-        Builder::macro('whereLikeWith', function ($attributes, string $searchTerm) {
+        Builder::macro('whereLikeWith', function (array $attributes, string $searchTerm) {
             $this->where(function (Builder $query) use ($attributes, $searchTerm) {
                 foreach (array_values($attributes) as $attribute) {
                     $query->when(
@@ -80,7 +80,7 @@ class AppServiceProvider extends ServiceProvider
 
         // model User::whereLikeName(['name','username', 'email'], ['bes','lid'] )
         // kjo eshte per mi gjet krejt users me emrat e shkrum ne input te ndame me hapsira
-        Builder::macro('whereLikeName',function($attributes,$searchTerms){
+        Builder::macro('whereLikeName',function(array $attributes,array $searchTerms){
             $this->where(function($query) use ($attributes,$searchTerms){
                 foreach(array_values($attributes) as $attribute){
                     foreach(array_values($searchTerms) as $searchTerm){

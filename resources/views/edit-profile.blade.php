@@ -25,7 +25,7 @@
                             <div class="col-md-6">
                                 <div class="row">
                                     <div class="col-sm-3 col-md-3 image-modal-post">
-                                        <img src="{{ asset('storage/'.$profile->photo) }}" class="rounded w-100">
+                                        <img src="{{ asset($profile->photo) }}" class="rounded w-100">
                                     </div>
                                     <div class="col-sm-9 col-md-9">
                                         <label class="input-group-text  @error('file') is-invalid @enderror" for="file-edit-profile">{{ __('Modifier') }}</label>

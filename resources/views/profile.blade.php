@@ -12,7 +12,7 @@
         <div class="card-body">
             <div class="row">
             <div class="col-sm-3 col-md-3">
-                <img src="{{ asset('storage/'.$profile->photo) }}" class="rounded w-100">
+                <img src="{{ asset($profile->photo) }}" class="rounded w-100">
             </div>
                 <div class="col-9 col-md-9">
                     <div class="col-12 p-1"><small class="text-muted">Nom: </small>{{ $profile->name }}</div>
@@ -58,7 +58,7 @@
               <div class="card-title body-profile">
                   <div class="row">
                       <div class="col-md-1 col-sm-2 img-profile">
-                          <img src="{{ asset('storage/'.$profile->photo) }}">
+                          <img src="{{ asset($profile->photo) }}">
                       </div>
                       <div class="col-md-7 col-sm-6">
                           <span class="card-title name-profile">{{ $post->user->name }}</span>
@@ -79,7 +79,7 @@
           
           <div class="card-body photo-post @if(!$post->photo) {{ __('d-none') }} @endif">
             @if($post->photo)
-                <img src="{{ asset('storage/'.$post->photo) }}" class="card-img-bottom" alt="...">
+                <img src="{{ asset($post->photo) }}" class="card-img-bottom" alt="...">
             @endif
           </div>
           

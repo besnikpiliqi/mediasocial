@@ -32,11 +32,15 @@ class Post extends Model
     }
     public function comments()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->orderBy('created_at','desc');
     }
 
     public function likes()
     {
         return $this->hasMany(LikePost::class);
+    }
+    public function likesComment()
+    {
+        return $this->hasManyThrough(LikeComment::class,Comment::class);// kjo eshte per dite sa lika i ka nje postim ne komentet e tij. kjo mirret me withCount ne Post
     }
 }
