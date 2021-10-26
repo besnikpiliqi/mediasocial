@@ -16,7 +16,7 @@ use App\Models\LikeComment;
 use App\Models\Comment;
 use App\Models\Follower;
 
-
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\MyFunc\MyFunc;
 
@@ -37,8 +37,20 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
+    // public function show(Post $post)
+    // {
+    //    $posts = $post->has('user')->with('user:id,name,email,picture')->findOrFail($post->id);
+
+    //     return view('your_blade_file_path',compact('posts));
+    // }
+    // Post::with(['user' => function ($query) {
+    //     $query->select('id','company_id', 'username');
+    // }, 'user.company' => function ($query) {
+    //     $query->select('id', 'name');
+    // }])->get();
     public function index()
     {
+        // $questions = Post::orderBy("created_at", 'desc')->skip(0)->take(3)->get();
         $user = auth()->user();
         $posts = tap(Post::whereIn('user_id',$user->following()->pluck('follow_id'))
                 ->with('user')
@@ -51,7 +63,14 @@ class HomeController extends Controller
                     $data->cree_at = MyFunc::timeDifferent($data->created_at);
                     return $data;
                });
-        // return response()->json(['posts' => $posts]);
+        // $post = Post::select(DB::raw('count(*)'))->whereColumn('user_id', 'users.id');
+        //        $users = User::select([
+        //         'users.*',
+        //         'last_posted_at' => $post
+        //     ])->get();
+        
+        // return response()->json(["posts" => $users]);
+        
         return view('home', ["posts" => $posts]);
     }
     public function prov(Request $request){
@@ -86,13 +105,13 @@ class HomeController extends Controller
         $postVoted = LikePost::where(['user_id'=>auth()->id(),'post_id'=>$post_id])->first();
         return response()->json($postVoted);
     }
+
     public function votePost(Request $request){
-        $votePost = LikePost::where(['user_id'=>auth()->id(),'post_id'=>$request->get('post_id')])->first();
-        if($votePost){
-            $votePost->update(['stars'=>$request->get('vote')]);
-        }else{
-            $votePost = LikePost::create(['user_id'=>auth()->id(),'post_id'=>$request->get('post_id'),'stars'=>$request->get('vote')]);
-        }
+        $arr = ['user_id'=>auth()->id(),'post_id'=>$request->get('post_id')];
+        $votePost = LikePost::updateOrCreate($arr,['stars'=>$request->get('vote')]);
+        /**
+         * History create or update it will be on the observer LikePostObserver.php
+         */
         return response()->json($votePost);
     }
 
@@ -101,18 +120,12 @@ class HomeController extends Controller
         return response()->json($postVoted);
     }
     public function voteComment(Request $request){
-        
-        $votePost = LikeComment::where(['user_id'=>auth()->id(),'comment_id'=>$request->get('comment_id')])->first();
-        if($votePost){
-            $votePost->update(['stars'=>$request->get('vote')]);
-        }else{
-            $comment_post_id = Comment::find($request->get('comment_id'))->first()->post_id;
-            $votePost = LikeComment::create([
-                'user_id'=>auth()->id(),
-                'post_id'=>$comment_post_id,
-                'comment_id'=>$request->get('comment_id'),
-                'stars'=>$request->get('vote')]);
-        }
+        $comment = Comment::find($request->get('comment_id'))->first();
+        $arr = [ 'user_id'=>auth()->id(), 'post_id'=>$comment->post_id, 'comment_id'=>$request->get('comment_id')];
+        $votePost = LikeComment::updateOrCreate($arr,['stars'=>$request->get('vote')]);
+        /**
+         * History create or update it will be on the observer LikeCommentObserver.php
+         */
         return response()->json($votePost);
     }
     public function newPost(Request $request){

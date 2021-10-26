@@ -1,4 +1,9 @@
-
+var Currency = {
+    rates: {"USD":1.0,"EUR":1.15993,"GBP":1.37197,"CAD":0.80791,"ARS":0.0100909,"AUD":0.741557,"BRL":0.183099,"CLP":0.00121398,"CNY":0.155381,"CYP":0.397899,"CZK":0.0456986,"DKK":0.155878,"EEK":0.0706676,"HKD":0.128571,"HUF":0.00322167,"ISK":0.00775752,"INR":0.0133185,"JMD":0.00670314,"JPY":0.00874635,"LVL":1.57329,"LTL":0.320236,"MTL":0.293496,"MXN":0.0491684,"NZD":0.70689,"NOK":0.118831,"PLN":0.253857,"SGD":0.741641,"SKK":21.5517,"SIT":175.439,"ZAR":0.0684941,"KRW":0.000843375,"SEK":0.115999,"CHF":1.08321,"TWD":0.0357126,"UYU":0.0227672,"MYR":0.240732,"BSD":1.0,"CRC":0.00158836,"RON":0.234378,"PHP":0.0197516,"AED":0.272294,"VEB":2.36027e-09,"IDR":7.08803e-05,"TRY":0.107852,"THB":0.0299187,"TTD":0.147233,"ILS":0.310391,"SYP":0.000795,"XCD":0.370286,"COP":0.000265796,"RUB":0.0141124,"HRK":0.154584,"KZT":0.00234907,"TZS":0.000432492,"XPT":1059.64,"SAR":0.266667,"NIO":0.0284492,"LAK":9.88773e-05,"OMR":2.60078,"AMD":0.00209022,"CDF":0.000503573,"KPW":0.00111111,"SPL":6.0,"KES":0.00901305,"ZWD":0.00276319,"KHR":0.000245732,"MVR":0.0640966,"GTQ":0.129319,"BZD":0.496209,"BYR":4.07332e-05,"LYD":0.219782,"DZD":0.00725309,"BIF":0.000502502,"GIP":1.37197,"BOB":0.144625,"XOF":0.00176831,"STD":4.72887e-05,"NGN":0.00243382,"PGK":0.28471,"ERN":0.0666667,"MWK":0.00122424,"CUP":0.04,"GMD":0.0192312,"CVE":0.010519,"BTN":0.0133185,"XAF":0.00176831,"UGX":0.000277178,"MAD":0.110421,"MNT":0.000350796,"LSL":0.0684941,"XAG":23.3628,"TOP":0.448596,"SHP":1.37197,"RSD":0.00986157,"HTG":0.00986492,"MGA":0.000253176,"MZN":0.0156988,"FKP":1.37197,"BWP":0.0888567,"HNL":0.0414928,"PYG":0.000144249,"JEP":1.37197,"EGP":0.0636401,"LBP":0.00066335,"ANG":0.55944,"WST":0.391498,"TVD":0.741557,"GYD":0.00476707,"GGP":1.37197,"NPR":0.00828524,"KMF":0.00235774,"IRR":2.37952e-05,"XPD":2076.62,"SRD":0.0467526,"TMM":5.72447e-05,"SZL":0.0684941,"MOP":0.124826,"BMD":1.0,"XPF":0.00972025,"ETB":0.0213985,"JOD":1.41044,"MDL":0.0579532,"MRO":0.00275624,"YER":0.00399683,"BAM":0.593065,"AWG":0.558659,"PEN":0.254238,"VEF":2.36027e-06,"SLL":9.4891e-05,"KYD":1.2195,"AOA":0.00167305,"TND":0.354167,"TJS":0.088538,"SCR":0.0672866,"LKR":0.0049785,"DJF":0.00561799,"GNF":0.000103064,"VUV":0.00905708,"SDG":0.00227752,"IMP":1.37197,"GEL":0.318807,"FJD":0.474943,"DOP":0.0177439,"XDR":1.41188,"MUR":0.0232099,"MMK":0.00054257,"LRD":0.00608777,"BBD":0.5,"ZMK":5.89334e-05,"XAU":1767.62,"VND":4.386e-05,"UAH":0.0377942,"TMT":0.286224,"IQD":0.000684965,"BGN":0.593065,"KGS":0.0117925,"RWF":0.000999926,"BHD":2.65957,"UZS":9.34143e-05,"PKR":0.00584399,"MKD":0.0188159,"AFN":0.012511,"NAD":0.0684941,"BDT":0.0116888,"AZN":0.588237,"SOS":0.0017138,"QAR":0.274725,"PAB":1.0,"CUC":1.0,"SVC":0.114286,"SBD":0.12415,"ALL":0.00954099,"BND":0.741641,"KWD":3.30754,"GHS":0.167023,"ZMW":0.0589334,"XBT":61109.4,"NTD":0.0337206,"BYN":0.407332,"CNH":0.155462,"MRU":0.0275624,"STN":0.0472887,"VES":0.236027,"MXV":0.326897,"VED":0.236027},
+    convert: function(amount, from, to) {
+      return (amount * this.rates[from]) / this.rates[to];
+    }
+  };
 var idLoaded = 0,
     bodyComment = $('.modal-body.comments-post'),
     bodyCommentStars = $('.modal-body.comments-stars'),
@@ -77,6 +82,7 @@ $( document ).ready(function() {
                 bodyPostStars.next().find('.vote-post').html('En votent..');
             },
             success: function(data) {
+                console.log(data)
                 if(data.post_id){
                     bodyPostStars.next().find('.vote-post').html('Voted');
                     $('#btn-vote-post-'+post_id+' .btn-voted').html('Voted');
@@ -285,6 +291,44 @@ $("form#edit-post").on("submit",function(e){
 
     });
 });
+var offsetMoreHistory = 10;
+function moreHistory(cette){
+    var _token = $('meta[name="csrf-token"]').attr('content');
+    var content = '';
+    $.ajax({
+        url: '/settings/more-history/'+offsetMoreHistory,
+        dataType : 'json',
+        type:'get',
+        headers: {'X-CSRF-TOKEN': _token},
+        // data:{offset:offsetMoreHistory},
+        beforeSend : function(){
+            $(cette).removeAttr('onclick').html('<button class="btn btn-primary btn-sm">En chargement...</button>');
+        },
+        success: function(data) {
+            offsetMoreHistory += 10;
+            console.log(offsetMoreHistory)
+            if(!$.isEmptyObject(data)){
+                 $(cette).attr('onclick','moreHistory(this)').html('<button class="btn btn-primary btn-sm">Plus</button>');
+                for (let i = 0; i < data.length; i++) {
+                    const element = data[i];
+                    content += '<div class="col-12 mb-3 p-4 border border-info rounded d-flex">'+
+                                    '<div class="col-1 me-1 img-profile"><img src="'+element.useraction.photo+'"></div>'+
+                                    '<div class="col-10"><a href="/profile/'+element.useraction.username+'"><b>'+element.useraction.name +'</b></a> '+element.action_value+'</div>'+
+                                    '<div class="col-1 d-flex justify-content-end" style="font-size: 12px;color: #64646a;">'+element.cree_at+'</div>'+
+                                '</div>';
+                    }
+                $('.row-history').append(content);
+            }else{
+                $(cette).remove();
+            }
+        },
+        error : function(data){
+            console.log(data)
+            alert("Il y avait un problème!");
+        },
+
+    });
+}
 function removePost(id){
     if(confirm("Voulez-vous supprimer ?")){
         var _token = $('meta[name="csrf-token"]').attr('content');

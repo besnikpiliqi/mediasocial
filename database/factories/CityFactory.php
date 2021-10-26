@@ -22,7 +22,8 @@ class CityFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'country_id' => rand(1,5),
+            'city'=> $this->faker->city,
         ];
     }
 }

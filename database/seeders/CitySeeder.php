@@ -16,14 +16,14 @@ class CitySeeder extends Seeder
      */
     public function run()
     {
-        // City::factory(5)->create();
-        $faker = Faker::create();
-        for ($i=0; $i < 20; $i++) { 
-            City::create([
-                'country_id' => rand(1,5),
-                'city'=> $faker->city,
-            ]);
-        }
+        City::factory(20)->create();
+        // $faker = Faker::create();
+        // for ($i=0; $i < 20; $i++) { 
+        //     City::create([
+        //         'country_id' => rand(1,5),
+        //         'city'=> $faker->city,
+        //     ]);
+        // }
         
     }
 }

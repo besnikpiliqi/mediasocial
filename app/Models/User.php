@@ -15,6 +15,8 @@ use App\Models\Follower;
 use App\Models\Comment;
 use App\Models\LikePost;
 use App\Models\LikeComment;
+use App\Models\History;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -38,6 +40,10 @@ class User extends Authenticatable
         'photo',
         'password',
     ];
+    // public function getIdAttribute($value)
+    // {
+    //     return Hash::make($value);
+    // }
     public function posts()
     {
         return $this->hasMany(Post::class)->orderBy('created_at', 'DESC');
@@ -60,6 +66,12 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(Comment::class, Post::class)->orderBy('created_at', 'DESC');
     }
+
+    public function historys()
+    {
+        return $this->hasMany(History::class);
+    }
+
     public function scopeWhereLike($query, $column, $value)
     {
         return $query->where($column, 'like', '%'.preg_replace("/[^A-Za-z0-9 ]/", '', $value).'%');

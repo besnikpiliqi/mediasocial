@@ -24,7 +24,7 @@ class PostFactory extends Factory
     {
         return [
             'user_id' => rand(1,30),
-            'photo'=>'http://lorempixel.com/400/200/sports/',
+            'photo'=>'/storage/posts//default.jpg',
             'content' => $this->faker->paragraph(),
         ];
     }

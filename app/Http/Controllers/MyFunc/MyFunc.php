@@ -10,6 +10,25 @@ use Carbon\Carbon;
 
 class MyFunc extends Controller
 {
+    public static function history($history){
+        $result = "";
+        switch ($history->action) {
+            case 'post.voted':
+                $result = "a voté votre publication avec une étoile ".$history->stars;
+                break;
+            case 'comment.voted':
+                $result = "a voté votre commentaire avec une étoile ".$history->stars;
+                break;
+            case 'commented':
+                $result = "a commenté sur votre publication";
+                break;
+            case 'followed':
+                $result = "vous a suivi";
+                break;
+        }
+        return $result;
+    }
+
     public static function avg($stars){
         $count = 0;
         foreach($stars as $star){
@@ -50,23 +69,29 @@ class MyFunc extends Controller
     }
 
     public static function timeDifferent($date){
-        $trouve = array("T", ".000000Z");
-        $remplace   = array(" ", "");
-        $dateFormated = str_replace($trouve, $remplace, $date);// this i make laravel transformé dans ce format "2021-10-06T14:25:58.000000Z" donc le T et .000000Z ne compté pas comme il faut surtout les heures
+        // $trouve = array("T", ".000000Z");
+        // $remplace   = array(" ", "");
+        // $dateFormated = str_replace($trouve, $remplace, $date);// this i make laravel transformé dans ce format "2021-10-06T14:25:58.000000Z" donc le T et .000000Z ne compté pas comme il faut surtout les heures
 
         $diff = Carbon::now('Europe/Paris')->diff($date);
         if($diff->y > 0){
-            return 'Il y a '.$diff->y.($diff->y == 1 ? ' an' : ' ans');
+            return $diff->y.'an';
+            // return 'Il y a '.$diff->y.($diff->y == 1 ? ' an' : ' ans');
         }elseif($diff->m > 0){
-            return 'Il y a '.$diff->m.($diff->m == 1 ? ' mois' : ' mois');
+            return $diff->m.'mois';
+            // return 'Il y a '.$diff->m.($diff->m == 1 ? ' mois' : ' mois');
         }elseif($diff->days > 0){
-            return 'Il y a '.$diff->days.($diff->days == 1 ? ' jour' : ' jours');
+            return $diff->days.'j';
+            // return 'Il y a '.$diff->days.($diff->days == 1 ? ' jour' : ' jours');
         }elseif($diff->h > 0){
-            return 'Il y a '.$diff->h.' heure';
+            return $diff->h.'h';
+            // return 'Il y a '.$diff->h.' heure';
         }elseif($diff->i > 0){
-            return 'Il y a '.$diff->i.($diff->i == 1 ? ' minute' : ' minutes');
+            return $diff->i.'min';
+            // return 'Il y a '.$diff->i.($diff->i == 1 ? ' minute' : ' minutes');
         }else{
-            return 'Il y a '.$diff->s.($diff->s == 1 ? ' seconde' : ' secondes');
+            return $diff->s.'sec';
+            // return 'Il y a '.$diff->s.($diff->s == 1 ? ' seconde' : ' secondes');
         }
         
     }

@@ -6,6 +6,13 @@ use Illuminate\Support\ServiceProvider;
 
 use Illuminate\Database\Eloquent\Builder;
 
+use App\Observers\LikePostObserver;
+use App\Models\LikePost;
+use App\Observers\LikeCommentObserver;
+use App\Models\LikeComment;
+use App\Observers\FollowerObserver;
+use App\Models\Follower;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -25,6 +32,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        LikePost::observe(LikePostObserver::class);
+        LikeComment::observe(LikeCommentObserver::class);
+        Follower::observe(FollowerObserver::class);
+
+        
         //model::search(['name','username', 'email'], $request->get('searche') )
         Builder::macro('search',function($attributes,string $searchTerm){
             // $searchTerm = str_replace(' ','%', $searchTerm);

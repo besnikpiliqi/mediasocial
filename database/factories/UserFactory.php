@@ -25,7 +25,7 @@ class UserFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'username' => $this->faker->username(),
-            'photo'=> 'http://lorempixel.com/400/200/sports/',
+            'photo'=> 'profilDefault.jpg',
             'city_id' => rand(1,20),
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),

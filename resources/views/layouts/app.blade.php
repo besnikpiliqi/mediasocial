@@ -10,7 +10,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('titre',config('app.name'))</title>
+    <title>@yield('titre')</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
@@ -24,9 +24,6 @@
     <link href="{{ asset('assets/css/app.css') }}" rel="stylesheet">
 </head>
 <body>
-    <script>
-        var user_id = <?php if(auth()->check()){ echo json_decode(auth()->id());} ?>;
-    </script>
     <nav class="navbar navbar-light bg-light fixed-top border-bottom">
         <div class="container-fluid">
             <nav class="navbar navbar-light bg-light">
@@ -57,6 +54,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('profile') }}">{{ __('Profile') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('settings.home') }}">{{ __('Réglages') }}</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('logout') }}">{{ __('Déconnexion') }}</a>

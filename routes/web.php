@@ -29,7 +29,29 @@ Route::group(['middleware'=> ['auth','verified'] ],function(){
     
     Route::get('/prov', [App\Http\Controllers\HomeController::class, 'prov']);
 
-    Route::get('/profile/{username?}', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
+    Route::get('/profile/{username?}', [App\Http\Controllers\ProfileController::class, 'index'])
+            ->where(['username' => '[A-Za-z0-9.]+'])
+            ->name('profile');
+    
+    /**
+     * Cette route est appelée dans...
+     */
+    Route::group(['prefix' => 'settings'], function()
+    {
+        Route::get('/', [App\Http\Controllers\SettingController::class, 'index'])->name('settings.home');
+        Route::get('/history', [App\Http\Controllers\SettingController::class, 'history'])->name('settings.history');
+        Route::get('/more-history/{offset}', [App\Http\Controllers\SettingController::class, 'moreHistory'])->name('settings.more.history');
+    });
+    Route::group([
+        'prefix' => 'accounts/{account_id}',
+        'where' => ['account_id' => '[0-9]+'],
+    ], function() {
+    
+        Route::get('detail', function($account_id){
+            //
+        });
+    });
+    
 
     Route::get('/edit-profile', [App\Http\Controllers\ProfileController::class, 'edit'])->middleware('password.confirm')->name('edit-profile');
     Route::post('/edit-profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('edit-profile');

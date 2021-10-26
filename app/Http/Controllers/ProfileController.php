@@ -9,6 +9,7 @@ use App\Models\Post;
 use App\Models\Follower;
 use App\Models\Country;
 use App\Models\City;
+use App\Models\History;
 
 use App\Http\Controllers\MyFunc\MyFunc;
 use Illuminate\Support\Facades\Validator;
@@ -146,21 +147,15 @@ class ProfileController extends Controller
         }
     }
     public function follow(Request $request){
-        $follower = Follower::where(['follow_id'=>$request->get('follow_id'),'user_id'=>auth()->id()])->first();
-        // return response()->json(['success'=>$follower]);
-        if($follower == null){
-           $follow = Follower::create([
-                'user_id' => auth()->id(),
-                'follow_id' => $request->get('follow_id')
-            ]);
-            if($follow){
-                return response()->json(['success'=>true]);
-            }else{
-                return response()->json(['success'=>false]);
-            }
+        $follow = Follower::firstOrCreate(['user_id' => auth()->id(), 'follow_id' => $request->get('follow_id')]);
+        if($follow){
+            return response()->json(['success'=>true]);
         }else{
             return response()->json(['success'=>false]);
         }
+        /**
+         * History create or update it will be on the observer FollowerObserver.php
+         */
     }
 
     

@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\User;
 use App\Models\Comment;
 use App\Models\LikePost;
 use App\Models\LikeComment;
+
+use App\Casts\PostCasts;
 
 class Post extends Model
 {
@@ -25,6 +28,16 @@ class Post extends Model
      * @var string[]
      */
     protected $fillable = ['user_id','photo','content'];
+    
+    protected $casts = [
+        // 'id'=> PostCasts::class,
+    ];
+    
+    // public function getUserIdAttribute($value)
+    // {
+    //     return Hash::make($value);
+    // }
+    
 
     public function user()
     {

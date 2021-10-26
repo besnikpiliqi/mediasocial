@@ -24,14 +24,32 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // $users = User::factory(10)->create();
-        $this->call(CountrySeeder::class);
-        $this->call(CitySeeder::class);
-        $this->call(UsersSeeder::class);
-        $this->call(FollowerSeeder::class);
-        $this->call(PostSeeder::class);
-        $this->call(LikePostSeeder::class);
-        $this->call(CommentSeeder::class);
-        $this->call(LikeCommentSeeder::class);
+        // $this->call(CountrySeeder::class);
+        // $this->call(CitySeeder::class);
+        // $this->call(UsersSeeder::class);
+        // $this->call(FollowerSeeder::class);
+        // $this->call(PostSeeder::class);
+        // $this->call(LikePostSeeder::class);
+        // $this->call(CommentSeeder::class);
+        // $this->call(LikeCommentSeeder::class);
+
+
+        for ($i=0; $i < 50; $i++) { 
+            $userId = User::insertGetId([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'username'=> $faker->username(),
+                'photo'=> '/storage/profile//AAAKDLCIL71wfwPEV5yKJpPhe6GKWj3A6YJascgP.jpg',
+                'password' => Hash::make($request->input('password')),
+            ]);
+            $userId = User::insertGetId([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'username'=> $faker->username(),
+                'photo'=> '/storage/profile//AAAKDLCIL71wfwPEV5yKJpPhe6GKWj3A6YJascgP.jpg',
+                'password' => Hash::make($request->input('password')),
+            ]);
+        }
 
         // $user = User::factory()->create();
         // $posts = Post::factory(40)->create(['user_id' => $user->id]);
