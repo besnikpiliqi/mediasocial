@@ -13,119 +13,67 @@ var idLoaded = 0,
     
 $( document ).ready(function() {
 
-    $(".vote-comment").click(function(e){
-        e.preventDefault();
-        var vote = Number(bodyCommentStars.find('.vote-stars-comment').val());
-        var comment_id = Number(bodyCommentStars.find('.id-comment').val());
-        
-        if(vote == 0){
-            alert("S'il vous plait choisissez une étoile!");
-            return;
-        }
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            url: '/vote-comment',
-            dataType : 'json',
-            type:'post',
-            data:{comment_id:comment_id,vote:vote},
-            beforeSend : function(){
-                bodyCommentStars.next().find('.vote-comment').html('En votent..');
-            },
-            success: function(data) {
-                console.log(data)
-                if(data.user_id){
-                    bodyCommentStars.next().find('.vote-comment').html('Voted');
-                    $('#btn-vote-comment-'+comment_id+' .btn-voted').html('Voted');
-                    setTimeout(function() {
-                       $( ".return-to-comment" ).trigger( "click" ); 
-                    },1000)
-                    
-                }else{
-                    bodyCommentStars.next().find('.vote-comment').html('Voter');
-                    alert('Il y avait un problème!'); 
-                }
-            },
-            error : function(data){
-                console.log(data)
-                bodyCommentStars.next().find('.vote-comment').html('Voter');
-                alert('Il y avait un problème!');
-            },
-
-        });
-    });
     
-    $(".vote-post").click(function(e){
-        e.preventDefault();
-        var vote = Number(bodyPostStars.find('.vote-stars-post').val());
-        var post_id = Number(bodyPostStars.find('.id-post').val());
-        
-        if(vote == 0){
-            alert("S'il vous plait choisissez une étoile!");
-            return;
-        }
-        console.log(vote)
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            url: '/vote-post',
-            dataType : 'json',
-            type:'post',
-            data:{post_id:post_id,vote:vote},
-            beforeSend : function(){
-                bodyPostStars.next().find('.vote-post').html('En votent..');
-            },
-            success: function(data) {
-                console.log(data)
-                if(data.post_id){
-                    bodyPostStars.next().find('.vote-post').html('Voted');
-                    $('#btn-vote-post-'+post_id+' .btn-voted').html('Voted');
-                    $( ".btn-close" ).trigger( "click" );
-                }else{
-                    bodyPostStars.next().find('.vote-post').html('Voter');
-                    alert('Il y avait un problème!'); 
-                }
-            },
-            error : function(data){
-                console.log(data)
-                bodyPostStars.next().find('.vote-post').html('Voter');
-                alert('Il y avait un problème!');
-            },
+    
+    
 
-        });
+});
+$(".vote-comment").click(function(e){
+    e.preventDefault();
+    var vote = Number(bodyCommentStars.find('.vote-stars-comment').val());
+    var comment_id = Number(bodyCommentStars.find('.id-comment').val());
+    bodyCommentStars.next().find('.vote-comment').html('En votent..');
+    if(vote == 0){
+        alert("S'il vous plait choisissez une étoile!");
+        return;
+    }
+    var data = $.ajaxPost('/vote-comment',{comment_id:comment_id,vote:vote});
+    if(!$.isEmptyObject(data)){
+        bodyCommentStars.next().find('.vote-comment').html('Voted');
+        $(`#btn-vote-comment-${comment_id} .btn-voted`).html('Voted');
+        setTimeout(function() {
+            $( ".return-to-comment" ).trigger( "click" ); 
+        },1000)
         
-    });
+    }else{
+        bodyCommentStars.next().find('.vote-comment').html('Voter');
+        alert('Il y avait un problème!'); 
+    }
+        
+});
 
+$(".vote-post").click(function(e){
+    e.preventDefault();
+    var vote = Number(bodyPostStars.find('.vote-stars-post').val());
+    var post_id = Number(bodyPostStars.find('.id-post').val());
+    
+    if(vote == 0){
+        alert("S'il vous plait choisissez une étoile!");
+        return;
+    }
+    bodyPostStars.next().find('.vote-post').html('En votent..');
+    var data = $.ajaxPost('/vote-post',{post_id:post_id,vote:vote});
+    if(!$.isEmptyObject(data)){
+        bodyPostStars.next().find('.vote-post').html('Voted');
+        $('#btn-vote-post-'+post_id+' .btn-voted').html('Voted');
+        $( ".btn-close" ).trigger( "click" );
+    }else{
+        bodyPostStars.next().find('.vote-post').html('Voter');
+        alert('Il y avait un problème!'); 
+    }
+    
 });
 
 function comments(post_id){
-    var _token = $('meta[name="csrf-token"]').attr('content');
-    if(idLoaded == post_id){
-        return;
+    bodyComment.html('<div class="loading-comments">En chargement...</div>');
+    var data = $.ajaxGet('/post-comments',{post_id:post_id});
+    if(data){
+        putModalComments(data);
+        $('.new-comment').val(post_id);
+        $('textarea.new-comment').val("");
+    }else{
+        bodyComment.html('<div class="loading-comments">Il y avait un problème!</div>');
     }
-    idLoaded = post_id;
-    $.ajax({
-        url: '/post-comments',
-        dataType : 'json',
-        type:'get',
-        headers: {'X-CSRF-TOKEN': _token},
-        data: {post_id:post_id},
-        beforeSend : function(){
-            bodyComment.html('<div class="loading-comments">Loading...</div>');
-        },
-        success: function(data) {
-            putModalComments(data);
-        },
-        error : function(data){
-            bodyComment.html('<div class="loading-comments">Il y avait un problème!</div>');
-        },
-    });
 }; 
 
 var result;
@@ -138,7 +86,17 @@ function putModalComments (data) {
         if(data[0].comments.length){
             for(i = 0;i < data[0].comments.length;i++){
                 var comment = data[0].comments[i];
-                content += '<div class="row d-flex justify-content-center">'+
+                content += rowComments(comment);
+            }
+        }else{
+            content += "<div class='text-center'>Il n'y a pas de commentaires</div>";
+        }
+        bodyComment.html(content);
+    }
+
+}
+function rowComments(comment){
+    return '<div class="row d-flex justify-content-center">'+
                 '<div class="card mb-3 w-75" id="comment-'+comment.id+'">'+
                     '<div class="card-body">'+
                     '<div class="row">'+
@@ -147,16 +105,21 @@ function putModalComments (data) {
                             '<img src="'+comment.user.photo+'">'+
                         '</div>'+
                     '</div>'+
-                    '<div class="col-7">'+
+                    '<div class="col-8">'+
                         '<h5 class="card-title name-profile" style="height:100%;"><a href="/profile/'+comment.user.username+'">'+comment.user.name+'</a></h5>'+
                     '</div>'+
                     (comment.is_commented ? 
-                    '<div class="col-3 d-flex justify-content-end">'+
+                    '<div class="col-1 d-flex justify-content-end">'+
+                        '<button type="button" class="btn" onclick="editComment('+comment.id+')" data-bs-target="#modaleditcomment" data-bs-toggle="modal"><i class="bi bi-pencil"></i></button>'+
+                        '</div>' : 
+                    '')+
+                    (comment.is_commented ? 
+                    '<div class="col-1 d-flex justify-content-end">'+
                         '<button type="button" class="btn" onclick="removeComment('+comment.id+')"><i class="bi bi-trash"></i></button>'+
                         '</div>' : 
                     '')+
                     '</div>'+
-                        '<p class="card-text">'+comment.content+'</p>'+
+                        '<p class="card-text content">'+comment.content+'</p>'+
                         '<p class="card-text"><small class="text-muted">'+comment.cree_at+'</small></p>'+
                     '</div>'+
                     '<div class="card-body border-top" id="btn-vote-comment-'+comment.id+'">'+
@@ -173,13 +136,6 @@ function putModalComments (data) {
                     '</div>'+
                 '</div>'+
             '</div>';
-            }
-        }else{
-            content += "<div class='text-center'>Il n'y a pas de commentaires</div>";
-        }
-        bodyComment.html(content);
-    }
-
 }
 
 function stars(cette){
@@ -213,16 +169,22 @@ function editPost(post_id) {
     $('textarea.edit-post').val(content);
     
 }
+function editComment(comment_id) {
+    var bodyComment = $('#comment-'+comment_id);
+    var content = bodyComment.find('.card-text.content').html();
+    $('#modaleditcomment textarea#edit-comment').val(content);
+    $('#modaleditcomment input.edit-comment').val(comment_id);   
+}
+
 $("form#new-post").on("submit",function(e){
     e.preventDefault();
     var posts = $('div.posts');
-    // var bodyPost = $('#post-'+post_id);
-    // var contentPost =  bodyPost.find('.card-text.content');
-    // var imgPost = bodyPost.find('.card-body.photo-post');
-    // var imgPostEdited = $('.image-modal-post img');
     var _token = $('meta[name="csrf-token"]').attr('content');
-    // var newContent = $('textarea.edit-post').val();
-   
+    var newContent = $('textarea.new-post').val();
+    if(!newContent.trim().length){
+        alert("Ecrivez vote publication!");
+        return
+    }
     $.ajax({
         url: '/new-post',
         dataType : 'json',
@@ -242,6 +204,7 @@ $("form#new-post").on("submit",function(e){
                 // imgPost.find('img').attr('src',imgPostEdited.attr('src'));
                 $('button.btn-close').trigger('click');
             }else{
+                $('button.new-post').html('Publier');
                 alert("Il y avait un problème!");
             }
         },
@@ -291,35 +254,38 @@ $("form#edit-post").on("submit",function(e){
 
     });
 });
-var offsetMoreHistory = 10;
-function moreHistory(cette){
+$("form#new-comment").on("submit",function(e){
+    e.preventDefault();
     var _token = $('meta[name="csrf-token"]').attr('content');
-    var content = '';
+    var newContent = $('textarea.new-comment').val();
+    if(!newContent.trim().length){
+        alert("Ecrivez vote commentaire!");
+        return
+    }
+    var post_id = Number($("input.new-comment").val());
     $.ajax({
-        url: '/settings/more-history/'+offsetMoreHistory,
+        url: '/new-comment',
         dataType : 'json',
-        type:'get',
+        type:'post',
         headers: {'X-CSRF-TOKEN': _token},
-        // data:{offset:offsetMoreHistory},
+        data:  new FormData(this),
+        contentType: false,
+        cache: false,
+        processData:false,
         beforeSend : function(){
-            $(cette).removeAttr('onclick').html('<button class="btn btn-primary btn-sm">En chargement...</button>');
+            $('button.new-comment').html('En publiant..');
         },
         success: function(data) {
-            offsetMoreHistory += 10;
-            console.log(offsetMoreHistory)
-            if(!$.isEmptyObject(data)){
-                 $(cette).attr('onclick','moreHistory(this)').html('<button class="btn btn-primary btn-sm">Plus</button>');
-                for (let i = 0; i < data.length; i++) {
-                    const element = data[i];
-                    content += '<div class="col-12 mb-3 p-4 border border-info rounded d-flex">'+
-                                    '<div class="col-1 me-1 img-profile"><img src="'+element.useraction.photo+'"></div>'+
-                                    '<div class="col-10"><a href="/profile/'+element.useraction.username+'"><b>'+element.useraction.name +'</b></a> '+element.action_value+'</div>'+
-                                    '<div class="col-1 d-flex justify-content-end" style="font-size: 12px;color: #64646a;">'+element.cree_at+'</div>'+
-                                '</div>';
-                    }
-                $('.row-history').append(content);
+            console.log(data)
+            if(data.success){
+                comments(post_id);
+                const numComments = $(`#post-${post_id}`).find('.badge.comment-count');
+                numComments.html(Number(numComments.html()) + 1); 
+                $('span.return-to-comment').trigger('click');
+                $('button.new-comment').html('Publier');
             }else{
-                $(cette).remove();
+                $('button.new-comment').html('Publier');
+                alert("Il y avait un problème!");
             }
         },
         error : function(data){
@@ -328,6 +294,50 @@ function moreHistory(cette){
         },
 
     });
+});
+$("form#edit-comment").on("submit",function(e){
+    e.preventDefault();
+    $('#modaleditcomment  button.edit-comment').attr('disabled','disabled').html('En modifiant..');
+    var posts = $('div.posts');
+    var _token = $('meta[name="csrf-token"]').attr('content');
+    var newContent = $('#modaleditcomment textarea#edit-comment').val();
+    var comment_id = $('#modaleditcomment input.edit-comment').val();
+    var bodyComment = $('#comment-'+comment_id);
+    
+    if(!newContent.trim().length){
+        alert("Ecrivez vote commentaire!");
+        return
+    }
+    var data = $.ajaxPost('/edit-comment/'+comment_id,{content:newContent});
+    if(data){
+        bodyComment.find('.card-text.content').html(newContent);
+        $('#modaleditcomment .return-to-comment').trigger('click');
+    }else{
+        alert("Il y avait un problème!");
+    }
+    $('#modaleditcomment button.edit-comment').removeAttr('disabled').html('Publier');
+});
+var offsetmoreNotification = 10;
+function moreNotification(cette){
+    $(cette).removeAttr('onclick').attr('disabled','disabled').html('<button class="btn btn-primary btn-sm">En chargement...</button>');
+    var data = $.ajaxGet('/more-notification',{offset:offsetmoreNotification});
+    var content = '';
+    if(!$.isEmptyObject(data)){
+        offsetmoreNotification += 10;
+        $(cette).attr('onclick','moreNotification(this)').html('<button class="btn btn-primary btn-sm">Plus</button>');
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            content += '<div class="col-12 mb-3 p-4 border border-info rounded d-flex">'+
+                            '<div class="col-1 me-1 img-profile"><img src="'+element.useraction.photo+'"></div>'+
+                            '<div class="col-10"><a href="/profile/'+element.useraction.username+'"><b>'+element.useraction.name +'</b></a> '+element.action_value+'</div>'+
+                            '<div class="col-1 d-flex justify-content-end" style="font-size: 12px;color: #64646a;">'+element.cree_at+'</div>'+
+                        '</div>';
+            }
+        $('.row-notification').append(content);
+    }else{
+        $(cette).remove();
+    }
+        
 }
 function removePost(id){
     if(confirm("Voulez-vous supprimer ?")){
@@ -393,110 +403,56 @@ function removeComment(id){
 function following(id){
     $('.modal-title.abonnes').html("Abonnementes");
     var body = $('.modal-body.abonnes');
-    var _token = $('meta[name="csrf-token"]').attr('content');
+    body.html('<div class="col-12 text-center">Loading...</div>');
+    var data = $.ajaxGet('/following',{id:id});
     var content = "";
-    $.ajax({
-        url: '/following/'+id,
-        dataType : 'json',
-        type:'get',
-        headers: {'X-CSRF-TOKEN': _token},
-        beforeSend : function(){
-            body.html('<div class="col-12 text-center">Loading...</div>');
-        },
-        success: function(data) {
-            if(data.length){
-                for (var i = 0; i < data.length; i++) {
-                    // var if_follow = (data[i].user_id == user_id ?? true); // this is to know if this user i have make follow or not
-                    content += '<div class="row pb-3"><div class="col-8 name-profile"><a href="/profile/'+data[i].user_following.username+'" class="">'+data[i].user_following.name+'</a></div>';
-                    content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].user_following.photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
-                    // if(if_follow){
-                    //     content += '<div class="col-4 d-flex justify-content-end"><button type="button" class="btn btn-primary btn-sm" onclick="unfollow(this,'+data[i].follow_id+')">Abonné</button></div>';
-                    // }else{
-                    //     content += '<div class="col-4 d-flex justify-content-end"><button type="button" class="btn btn-primary btn-sm" onclick="follow(this,'+data[i].follow_id+')">Abonner</button></div>';
-                    // }
-                    content += '</div>';
-                }
-                body.html(content);
-            }else{
-                body.html("<div class='col-12 text-center'>Il n'y a pas des abonnementes!</div>"); 
-            }
-        },
-        error : function(data){
-            body.html('<div class="col-12 text-center">Il y avait un problème!</div>');
-        },
-
-    });
+    if(!$.isEmptyObject(data)){
+        for (var i = 0; i < data.length; i++) {
+            content += '<div class="row pb-3"><div class="col-8 name-profile"><a href="/profile/'+data[i].user_following.username+'" class="">'+data[i].user_following.name+'</a></div>';
+            content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].user_following.photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
+            content += '</div>';
+        }
+        body.html(content);
+    }else{
+        body.html("<div class='col-12 text-center'>Il n'y a pas des abonnementes!</div>"); 
+    }
+        
 }
 function searche(){
     var body = $('.body-searche-user');
+    body.html('<div class="d-100 text-center">Loading...</div>');
     var _token = $('meta[name="csrf-token"]').attr('content');
     var content = "";
-    $.ajax({
-        url: '/searche',
-        dataType : 'json',
-        type:'get',
-        headers: {'X-CSRF-TOKEN': _token},
-        data:{ searche : $('input.searche').val() },
-        beforeSend : function(){
-            body.html('<div class="d-100 text-center">Loading...</div>');
-        },
-        success: function(data) {
-            console.log(data);
-            if(data.length){
-                for (var i = 0; i < data.length; i++) {
-                    content += '<div class="row pb-3">';
-                    content += '<div class="col-8 name-profile"><a href="/profile/'+data[i].username+'" class="">'+data[i].name+'</a></div>';
-                    content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
-                    content += '</div>';
-                }
-                body.html(content);
-            }else{
-                body.html("<div class='col-12 text-center'>N'existe pas aucun utilisateur avec ce nom!</div>"); 
-            }
-        },
-        error : function(data){
-            body.html('<div class="col-12 text-center">Il y avait un problème!</div>');
-        },
-    });
+    var data = $.ajaxGet('/searche',{searche : $('input.searche').val()});
+    if(!$.isEmptyObject(data)){
+        for (var i = 0; i < data.length; i++) {
+            content += '<div class="row pb-3">';
+            content += '<div class="col-8 name-profile"><a href="/profile/'+data[i].username+'" class="">'+data[i].name+'</a></div>';
+            content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
+            content += '</div>';
+        }
+        body.html(content);
+    }else{
+        body.html("<div class='col-12 text-center'>N'existe pas aucun utilisateur avec ce nom!</div>"); 
+    }
+        
 }
 function followed(id){
     $('.modal-title.abonnes').html("Abonnées");
     var body = $('.modal-body.abonnes');
-    var _token = $('meta[name="csrf-token"]').attr('content');
+    body.html('<div class="col-12 text-center">Loading...</div>');
+    var data = $.ajaxGet('/followed',{id:id});
     var content = "";
-    $.ajax({
-        url: '/followed/'+id,
-        dataType : 'json',
-        type:'get',
-        headers: {'X-CSRF-TOKEN': _token},
-        beforeSend : function(){
-            body.html('<div class="col-12 text-center">Loading...</div>');
-        },
-        success: function(data) {
-            console.log(data)
-            if(data.length){
-                for (var i = 0; i < data.length; i++) {
-                    // var if_follow = (data[i].follow_id == user_id ?? true); // this is to know if this user i have make follow or not
-                    content += '<div class="row pb-3"><div class="col-8 name-profile"><a href="/profile/'+data[i].user_followed.username+'" class="">'+data[i].user_followed.name+'</a></div>';
-                    content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].user_followed.photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
-                    // if(if_follow){
-                    //     content += '<div class="col-4 d-flex justify-content-end"><button type="button" class="btn btn-primary btn-sm" onclick="unfollow(this,'+data[i].user_id+')">Abonné</button></div>';
-                    // }else{
-                    //     // content += '<div class="col-4 d-flex justify-content-end"><button type="button" class="btn btn-primary btn-sm" onclick="follow(this,'+data[i].user_id+')">Abonner</button></div>';
-                        
-                    // }
-                    content += '</div>';
-                }
-                body.html(content);
-            }else{
-                body.html("<div class='col-12 text-center'>Il n'y a pas des abonnées!</div>"); 
-            }
-        },
-        error : function(data){
-            body.html('<div class="col-12 text-center">Il y avait un problème!</div>');
-        },
-
-    });
+    if(!$.isEmptyObject(data)){
+        for (var i = 0; i < data.length; i++) {
+            content += '<div class="row pb-3"><div class="col-8 name-profile"><a href="/profile/'+data[i].user_followed.username+'" class="">'+data[i].user_followed.name+'</a></div>';
+            content += '<div class="col-4 d-flex justify-content-end"><img src="'+data[i].user_followed.photo+'" style="width:40px;height:40px;border-radius: 5px;"></div>';
+            content += '</div>';
+        }
+        body.html(content);
+    }else{
+        body.html("<div class='col-12 text-center'>Il n'y a pas des abonnées!</div>"); 
+    }
 }
 
 function abonnement(id){
@@ -504,94 +460,161 @@ function abonnement(id){
 }
 
 function follow(cette,id){
-    
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-    $.ajax({
-        url: '/follow',
-        dataType : 'json',
-        type:'post',
-        data: {follow_id : id},
-        success: function(data) {
-            console.log(data)
-            if(data.success){
-                $(cette).attr('onclick',"unfollow(this,"+id+")").html('Abonné');
-                $('#followed').html(Number($('#followed').html()) + 1);
-                if($('#btn-cancel-follow').length){
-                    $('#btn-cancel-follow').remove();
-                }
-            }else{
-                alert('Il y avait un problème!'); 
+    var response = $.ajaxPost('/follow', {follow_id:id});
+    if (response) {
+        $(cette).attr('onclick',`unfollow(this,${id})`).html('Abonné'); 
+            $('#followed').html(Number($('#followed').html()) + 1);
+            if($('#btn-cancel-follow').length){
+                $('#btn-cancel-follow').remove();
             }
-        },
-        error : function(data){
-            alert('Il y avait un problème!');
-        },
-
-    });
+    }else{
+        alert('Il y avait un problème!'); 
+    }
 }
 function unfollow(cette,id){
-    if(confirm("Voulez-vous vraiment vous desabonner!")){
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            url: '/unfollow',
-            dataType : 'json',
-            type:'post',
-            data:{follow_id:id},
-            success: function(data) {
-                console.log(data)
-                if(data.success){
-                    $(cette).attr('onclick',"follow(this,"+id+")").html('Abonner');
-                    $('#followed').html(Number($('#followed').html()) - 1);
-                }else{
-                    alert('Il y avait un problème!'); 
-                }
-            },
-            error : function(data){
-                alert('Il y avait un problème!');
-            },
-
-        });
+    if (confirm("Voules-vous vraiment retirer des abonnées!")) {
+        var response = $.ajaxPost('/unfollow', {follow_id:id});
+        if (response) {
+            $(cette).attr('onclick',`follow(this,${id})`).html('Abonner');
+            $('#followed').html(Number($('#followed').html()) - 1);
+        }else{
+            alert('Il y avait un problème!'); 
+        }
     }
 }
-
-function cancelfollow(id){
-    if(confirm("Voules-vous vraiment retirer des abonnées!")){
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+$.extend({
+    ajaxGet: (url, data) => {
+        var result = null;
+        var _token = $('meta[name="csrf-token"]').attr('content');
         $.ajax({
-            url: '/cancelfollow',
-            dataType : 'json',
-            type:'post',
-            data:{follow_id:id},
-            success: function(data) {
+            url: url,
+            type: 'GET',
+            headers: { 'X-CSRF-TOKEN': _token },
+            data: data,
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                result = data;
+            },
+            error: function (data) {
+                // result = data;
                 console.log(data)
-                if(data.success){
-                    $('#btn-back-follow').attr('onclick',"follow("+id+")").html('Abonner');
-                    $('#btn-cancel-follow').remove();
-                    $('#following').html(Number($('#following').html()) - 1);
-                }else{
-                    alert('Il y avait un problème!'); 
-                }
+            },
+        });
+        return result;
+    }
+});
+$.extend({
+    ajaxPost: function(url, data) {
+        var result = null;
+        var _token = $('meta[name="csrf-token"]').attr('content');
+        $.ajax({
+            url: url,
+            type: 'POST',
+            headers: {'X-CSRF-TOKEN': _token},
+            data: data,
+            // dataType: "json",
+            async: false,
+            success: function(data) {
+                result = data;
             },
             error : function(data){
-                alert('Il y avait un problème!');
+                // result = data;
+                console.log(data)
             },
-
         });
+        return result;
+    }
+});
+
+// set ajax response in var
+
+// function cncFoll(id){
+//     var result = false;
+//     var _token = $('meta[name="csrf-token"]').attr('content');
+//     $.ajax({
+//         url: '/cancelfollow',
+//         dataType : 'json',
+//         type:'post',
+//         headers: {'X-CSRF-TOKEN': _token},
+//         data:{follow_id:id},
+//         success: function(data) {
+//             console.log(data)
+//             if(data){ result = true;}
+//         },
+//         error : function(data){
+//             console.log(data)
+//         },
+//     });
+//     return result;
+    
+// }
+
+function cancelfollProf(id) {
+    if (confirm("Voules-vous vraiment retirer des abonnées!")) {
+        var response = $.ajaxPost('/unfollow', {follow_id:id});
+        if (response) {
+            $('#btn-back-follow').attr('onclick', `follow(${id})`).html('Abonner');
+            $('#btn-cancel-follow').remove();
+            $('#following').html(Number($('#following').html()) - 1);
+        }else {
+            alert('Il y avait un problème!');
+        }
     }
 }
-
+function cancelfollowingReq(id) {
+    if (confirm("Voules-vous vraiment retirer des abonnées!")) {
+        var response = $.ajaxPost('/unfollow', {follow_id:id});
+        console.log(response);
+        if (response) {
+            $(`#btn-${id} button`).attr('onclick', `sendFollowingReq(${id})`).html('Abonner');
+        } else {
+            alert('Il y avait un problème!');
+        }
+    }
+}
+function cancelfollowedReq(id) {
+    if (confirm("Voules-vous vraiment retirer des abonnées!")) {
+        var response = $.ajaxPost('/unfollow', {follow_id:id});
+        console.log(response);
+        if (response) {
+            $(`#btn-${id} button#btn-cancel-follow`).attr('onclick', `sendFollowingReq(${id})`).html('Abonner');
+            $(`#btn-${id} button#btn-back-follow`).remove();
+        } else {
+            alert('Il y avait un problème!');
+        }
+    }
+}
+function sendFollowingReq(id) {
+    var response = $.ajaxPost('/follow',{follow_id:id});
+    console.log(id);
+    if (response) {
+        $(`#btn-${id} button`).attr('onclick', `cancelfollowingReq(${id})`).html('Retirer');
+    } else {
+        alert('Il y avait un problème!');
+    }
+}
+function acceptfollowedReq(id) {
+    var response = $.ajaxPost('/follow',{follow_id:id});
+    console.log(id);
+    if (response) {
+        const onclick = 'onclick';
+        $(`#btn-${id} button#btn-back-follow`).addClass('pull-right').attr(onclick, `deletefollowed(${id})`).html('Abonné');
+        $(`#btn-${id} button#btn-cancel-follow`).remove();
+    } else {
+        alert('Il y avait un problème!');
+    }
+}
+function deletefollowed(id) {
+    var response = $.ajaxPost('/unfollow',{follow_id:id});
+    console.log(id);
+    if (response) {
+        const onclick = 'onclick';
+        $(`#btn-${id} button`).attr(onclick, `sendFollowingReq(${id})`).html('Abonner');
+    } else {
+        alert('Il y avait un problème!');
+    }
+}
 function avgComment(likes){
     var stars = 0;
     for (var i = 0; i < likes.length; i++) {

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use App\Models\User;
+use App\Models\Photo;
 use App\Models\Post;
 use App\Models\LikePost;
 use App\Models\LikeComment;
@@ -63,13 +64,32 @@ class HomeController extends Controller
                     $data->cree_at = MyFunc::timeDifferent($data->created_at);
                     return $data;
                });
-        // $post = Post::select(DB::raw('count(*)'))->whereColumn('user_id', 'users.id');
-        //        $users = User::select([
-        //         'users.*',
-        //         'last_posted_at' => $post
-        //     ])->get();
+            //    $token = request()->user()->currentAccessToken()->plainTextToken;
         
-        // return response()->json(["posts" => $users]);
+            $posts = $user
+                    ->withAvg('haveLikedPost','stars')
+                    ->withAvg('likesPost','stars')
+                    ->withAvg('haveLikedComment','stars')
+                    ->withAvg('likesComment','stars')
+                    ->withCount('haveLikedPost')
+                    ->withCount('likesPost')
+                    ->withCount('haveLikedComment')
+                    ->withCount('likesComment')
+                    ->get();
+                    $id1 = 5;
+                    $id2 = 1;
+               $followed = Follower::where(function ($query) use ($id1,$id2) {
+                    $query->where(['user_id'=> $id2,'follow_id'=>$id1]);
+                })
+                ->orwhere(function ($query) use ($id1,$id2) {
+                    $query->where(['follow_id'=> $id2,'user_id'=>$id1]);
+                })->get();
+        // $post = Follower::whereIn('follow_id',$user->followed()->pluck('follow_id'))->with('userFollowed')->get();// kshtu per mi kqyr kush te ka ba follow e hala sja ke kthy
+        // $followed = $user->followed()->pluck('user_id');
+        // $followingNotAcceptedByOthers = $user->following()->whereNotIn('follow_id',$user->followed()->pluck('user_id'))->with('userFollowing')->get();
+        // $followedNotAcceptedByMe = $user->followed()->whereNotIn('user_id',$user->following()->pluck('follow_id'))->with('userFollowed')->get();
+        // // Follower::whereNotIn('user_id',$user->followed()->pluck('follow_id'))->with('userFollowing')->get();// kshtu per mi kqyr kush te ka ba follow e hala sja ke kthy
+        return response()->json(["posts" => $followed]);
         
         return view('home', ["posts" => $posts]);
     }
@@ -139,12 +159,14 @@ class HomeController extends Controller
             return response()->json(['error'=>$validate->messages()]);
         }
         $post = new Post();
+        $post->user_id = auth()->id();
+        $post->content = $request->content;
+        
         if($request->hasFile('file')){
             $post->photo = '/storage/'.$request->file('file')->store('posts/', ['disk' => 'public']);
         }
-        $post->user_id = auth()->id();
-        $post->content = $request->content;
-        return response()->json(['success'=>$post->save()]);
+        $saved = $post->save();
+        return response()->json(['success'=>$saved]);
     }
     public function editPost(Request $request,Post $post){
         if (!Gate::allows('update-post', $post)) {
@@ -174,6 +196,36 @@ class HomeController extends Controller
        return response()->json(['success'=>$post->save()]);
         
         
+    }
+    public function newComment(Request $request){
+        $validate = Validator::make($request->all(),
+        ['content' => ['required', 'max:255']],
+        ['content.required'=>"C'est obligé",'content.max'=>"Le contenu est au maximum 255 lettre",]);
+
+        if($validate->fails()){
+            return response()->json(['error'=>$validate->messages()]);
+        }
+        $post = Post::find($request->post_id);
+
+        $comment = $post->comments()->create([
+            'user_id' => auth()->id(),
+            'content' => $request->content,
+        ]);
+        return response()->json(['success'=>$comment->user_id]);
+    }
+    public function editComment(Request $request,Comment $comment){
+        if(!Gate::allows('edit-comment', $comment)) {
+            return response()->json(false);
+        }
+        $validate = Validator::make($request->all(),
+        ['content' => ['required', 'max:255']],
+        ['content.required'=>"C'est obligé",'content.max'=>"Le contenu est au maximum 255 lettre",]);
+
+        if($validate->fails()){
+            return response()->json(['error'=>$validate->messages()]);
+        }
+        $comment->content = $request->content;
+        return response()->json($comment->save());
     }
     public function deletePost(Post $post){
         if (!Gate::allows('delete-post', $post)) {
@@ -239,9 +291,9 @@ class HomeController extends Controller
         return response()->json($comments);
     }
 
-    public function logout()
-    {
-        Auth::logout();
-        return redirect()->route('login');
-    }
+    // public function logout()
+    // {
+    //     Auth::logout();
+    //     return redirect()->route('login');
+    // }
 }

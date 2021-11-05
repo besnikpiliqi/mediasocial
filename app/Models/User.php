@@ -15,7 +15,8 @@ use App\Models\Follower;
 use App\Models\Comment;
 use App\Models\LikePost;
 use App\Models\LikeComment;
-use App\Models\History;
+use App\Models\Notification;
+use App\Models\Photo;
 use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
@@ -44,6 +45,10 @@ class User extends Authenticatable
     // {
     //     return Hash::make($value);
     // }
+    // public function image()
+    // {
+    //     return $this->morphOne(Photo::class, 'imageable');
+    // }
     public function posts()
     {
         return $this->hasMany(Post::class)->orderBy('created_at', 'DESC');
@@ -66,10 +71,31 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(Comment::class, Post::class)->orderBy('created_at', 'DESC');
     }
-
-    public function historys()
+    public function haveLikedPost()
     {
-        return $this->hasMany(History::class);
+        // this is for the user(selected) that have own likes posts that the other users have liked his posts
+        return $this->hasManyThrough(LikePost::class, Post::class);
+    }
+    public function likesPost()
+    {
+        // this is for the posts liked that user(selected) has liked on the others users
+       return $this->hasMany(LikePost::class);
+    }
+    public function likesComment()
+    {
+        // this is for the comments liked that user(selected) has liked on the others users
+        // i put Comment::class because the comments.user_id need to check with the users.id because in the table comments contien the user _id of user that he have liked but not user_id of the post_id
+        return $this->hasManyThrough(LikeComment::class, Comment::class);
+    }
+    public function haveLikedComment()
+    {
+        // this is for the user(selected) that have own likes comments that the other users have liked his comments
+        // i put the Post::class because the post.user_id need to check with users.id because just in table posts are the user_id that contain to the user selected
+        return $this->hasManyThrough(LikeComment::class, Post::class);
+    }
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
     }
 
     public function scopeWhereLike($query, $column, $value)

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Latest compiled and minified CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link href="{{ asset('assets/css/bootstrap_5_1_1.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     
     <!-- CSRF Token -->
@@ -12,9 +12,7 @@
 
     <title>@yield('titre')</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-
+    
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
@@ -23,7 +21,7 @@
     <!-- Styles -->
     <link href="{{ asset('assets/css/app.css') }}" rel="stylesheet">
 </head>
-<body>
+<body style="position: relative;">
     <nav class="navbar navbar-light bg-light fixed-top border-bottom">
         <div class="container-fluid">
             <nav class="navbar navbar-light bg-light">
@@ -87,7 +85,7 @@
         </div>
     </nav>
     @auth
-    <button type="button" class="btn btn-primary fixed-bottom"> {{ __('Notifications') }} <span class="badge bg-secondary">4</span></button>
+    <a href="{{ route('notification') }}" style="width: 160px;" class="btn btn-primary fixed-bottom"> {{ __('Notifications') }} <span class="badge bg-secondary">{{ \App\Http\Controllers\SettingController::notificationCount() }}</span></a>
     @endauth
     <div class="py-5">
         <div class="container py-5">
@@ -96,9 +94,11 @@
     </div>
     
     
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js" integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js" integrity="sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.min.js" integrity="sha384-skAcpIdS7UcVUC05LJ9Dxay8AXcDYfBJqt1CJ85S/CFujBsIzCIv+l9liuYLaMQ/" crossorigin="anonymous"></script> -->
+    <script type="text/javascript" src="{{ asset('assets/js/popper_2_9_3.js')  }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/bootstrap_5_1_1.js')  }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/jquery.js')  }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/myfunc.js')  }}"></script>
 </body>
 </html>

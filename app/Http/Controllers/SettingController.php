@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-use App\Models\History;
+use App\Models\Notification;
 use App\Http\Controllers\MyFunc\MyFunc;
 
 class SettingController extends Controller
@@ -23,15 +23,15 @@ class SettingController extends Controller
     public function index(){
         return view('settings.home');
     }
-    public function moreHistory($offset){
-        $historys = auth()->user()->historys()
+    public function moreNotifications(Request $request){
+        $notifications = auth()->user()->notifications()
         ->with('useraction')
-        ->skip($offset)->take(10)
+        ->skip($request->offset)->take(10)
         ->get();
 
-        History::whereIn('id',array_column($historys->toArray(),'id'))->update(['viewed'=>0]);
+        Notification::whereIn('id',array_column($notifications->toArray(),'id'))->update(['viewed'=>0]);
 
-        $historys->map(function($data){
+        $notifications->map(function($data){
             /**
              * these i make just for Jquery but i will also use in blade like in Jquery
              */
@@ -39,23 +39,35 @@ class SettingController extends Controller
             $data->action_value = MyFunc::history($data);
             return $data;
         });
-        return response()->json($historys);
+        return response()->json($notifications);
     }
-    public function history(){
-        $historys = auth()->user()->historys()
-        ->with('useraction')
+    public static function notificationCount(){
+        return auth()->user()->notifications()->where('viewed',1)->count();
+    }
+    public function notification(){
+        auth()->user()->notifications()->update(['viewed'=>0]);
+        $notifications = auth()->user()->notifications()
+        // $notifications->update(['viewed'=>0]);
+        // $notifications->refresh();
         ->take(10)
         ->get();
 
-        History::whereIn('id',array_column($historys->toArray(),'id'))->update(['viewed'=>0]);
-
-        $historys->map(function($data){
+        
+        $notifications->map(function($data){
             $data->cree_at = MyFunc::timeDifferent($data->created_at);
             $data->action_value = MyFunc::history($data);
             return $data;
         });
         
-        // return response()->json($historys);
-        return view('settings.history',['historys'=>$historys]);
+        // return response()->json($notifications);
+        return view('settings.notification',['notifications'=>$notifications]);
+    }
+
+    public function request(){
+        $user = auth()->user();
+        $followingNotAcceptedByOthers = $user->following()->whereNotIn('follow_id',$user->followed()->pluck('user_id'))->with('userFollowing')->get();
+        $followedNotAcceptedByMe = $user->followed()->whereNotIn('user_id',$user->following()->pluck('follow_id'))->with('userFollowed')->get();
+        // return response()->json(['followingNotAcceptedByOthers'=>$followingNotAcceptedByOthers,'followedNotAcceptedByMe'=>$followedNotAcceptedByMe]);
+        return view('settings.request',['followingNotAcceptedByOthers'=>$followingNotAcceptedByOthers,'followedNotAcceptedByMe'=>$followedNotAcceptedByMe]);
     }
 }

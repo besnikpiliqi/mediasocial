@@ -16,8 +16,8 @@
   </div>
 </div>
 
-<!-- Modal post étoiles-->
-<div class="modal fade" id="modaletoilespost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<!-- Modal post étoiles class="modal fade" id="modaletoilespost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" -->
+<div class="modal fade show" id="modaletoilespost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: block; padding-left: 0px;" aria-modal="true" role="dialog">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       
@@ -44,7 +44,7 @@
 </div>
 
 <!-- Modal post comment-->
-<div class="modal fade" id="modalmakecomment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="modalmakepost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -94,8 +94,57 @@
         
       </div>
       <div class="modal-footer">
+      <button class="btn btn-primary make-comment" data-bs-target="#modalmakecomment" data-bs-toggle="modal">{{ __('Ecriver un commentaire')}}</button>
+
         <button class="btn btn-secondary"  data-bs-dismiss="modal" aria-label="Close">{{ __('Fermer')}}</button>
       </div>
+    </div>
+  </div>
+</div>
+<!-- make comment in the post -->
+<div class="modal fade" id="modalmakecomment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalToggleLabel2" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalToggleLabel2">{{ __('Ecrive un commentaire.') }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      {!! Form::open(['url'=>'new-comment','class'=>'form-inline','id'=>'new-comment']) !!}
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="exampleFormControlTextareaModifier" class="form-label">{{ __('Entrer votre commentaire')}}</label>
+          <textarea name="content" class="form-control new-comment" id="exampleFormControlTextareaModifier" pattern="[A-Za-z0-9]{1,255}" required rows="3" placeholder="{{ __('Ecrivez votre message') }}"></textarea>
+        </div>
+        <input type="hidden" name="post_id" value="0" class="new-comment">
+      </div>
+      <div class="modal-footer">
+        <span class="btn btn-secondary return-to-comment" data-bs-target="#modalcommentes" data-bs-toggle="modal">{{ __('Retourner aux commentaires')}}</span>
+        <button type="submit" class="btn btn-primary new-comment">{{ __('Publier') }}</button>
+      </div>
+      {!! Form::close() !!}
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="modaleditcomment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalToggleLabeEditComment" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalToggleLabeEditComment">{{ __('Modifier votre commentaire.') }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      {!! Form::open(['url'=>'edit-comment','class'=>'form-inline','id'=>'edit-comment']) !!}
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="edit-comment" class="form-label">{{ __('Entrer votre commentaire')}}</label>
+          <textarea name="content" class="form-control edit-comment" id="edit-comment" pattern="[A-Za-z0-9]{1,255}" required rows="3" placeholder="{{ __('Ecrivez votre message') }}"></textarea>
+        </div>
+        <input type="hidden" name="comment_id" value="0" class="edit-comment">
+      </div>
+      <div class="modal-footer">
+        <span class="btn btn-secondary return-to-comment" data-bs-target="#modalcommentes" data-bs-toggle="modal">{{ __('Retourner aux commentaires')}}</span>
+        <button type="submit" class="btn btn-primary edit-comment">{{ __('Modifier') }}</button>
+      </div>
+      {!! Form::close() !!}
     </div>
   </div>
 </div>

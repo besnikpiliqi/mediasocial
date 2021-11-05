@@ -28,7 +28,7 @@
                     @elseif(App\Http\Controllers\MyFunc\Myfunc::followed($profile))
                         <div class="col-12 p-1">
                             <button type="button" class="btn btn-primary btn-sm" id="btn-back-follow" onclick="follow(this,{{ $profile->id }})" style="margin-right: 10px;">{{ __('Retour abonner') }}</button>
-                            <button type="button" class="btn btn-primary btn-sm" id="btn-cancel-follow" onclick="cancelfollow({{ $profile->id }})">{{ __('Retirer') }}</button>
+                            <button type="button" class="btn btn-primary btn-sm" id="btn-cancel-follow" onclick="cancelfollProf({{ $profile->id }})">{{ __('Retirer') }}</button>
                         </div>
                     @else
                         <div class="col-12 p-1"><button type="button" class="btn btn-primary btn-sm" onclick="follow(this,{{ $profile->id }})">{{ __('Abonner') }}</button></div>
@@ -40,10 +40,74 @@
     <div class="mb-3 w-75">
         <div class="card-body p-0">
           <div class="row">
+            <div class="col-6">
+                <div class="col-12">{{ __('Ses votes dans des publicatioons: ') }}</div>
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary btn-sm">
+                        <span class="badge bg-secondary">{{ number_format($profile->likes_post_avg_stars) }}</span>
+                        <span class="fa fa-star" @if(number_format($profile->likes_post_avg_stars) >= 1) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->likes_post_avg_stars) >= 2) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->likes_post_avg_stars) >= 3) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->likes_post_avg_stars) >= 4) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->likes_post_avg_stars) == 5) style="color:orange" @endif></span> {{ __('Votes') }} <span class="badge bg-secondary">{{ $profile->likes_post_count }}</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-6">
+            <div class="col-12 d-flex flex-row-reverse">{{ __('Ses votes dans des commentaires: ') }}</div>
+                <div class="col-12 d-flex flex-row-reverse">
+                    <button type="button" class="btn btn-primary btn-sm">
+                        <span class="badge bg-secondary">{{ number_format($profile->likes_comment_avg_stars) }}</span>
+                        <span class="fa fa-star" @if(number_format($profile->likes_comment_avg_stars) >= 1) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->likes_comment_avg_stars) >= 2) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->likes_comment_avg_stars) >= 3) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->likes_comment_avg_stars) >= 4) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->likes_comment_avg_stars) == 5) style="color:orange" @endif></span> {{ __('Votes') }} <span class="badge bg-secondary">{{ $profile->likes_comment_count }}</span>
+                    </button>
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="mb-3 w-75">
+        <div class="card-body p-0">
+          <div class="row">
+            <div class="col-6">
+                <div class="col-12">{{ __('Des votes dans ses publicatioons: ') }}</div>
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary btn-sm">
+                        <span class="badge bg-secondary">{{ number_format($profile->have_liked_post_avg_stars) }}</span>
+                        <span class="fa fa-star" @if(number_format($profile->have_liked_post_avg_stars) >= 1) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->have_liked_post_avg_stars) >= 2) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->have_liked_post_avg_stars) >= 3) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->have_liked_post_avg_stars) >= 4) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->have_liked_post_avg_stars) == 5) style="color:orange" @endif></span> {{ __('Votes') }} <span class="badge bg-secondary">{{ $profile->have_liked_post_count }}</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-6">
+            <div class="col-12 d-flex flex-row-reverse">{{ __('Des votes dans ses commentaires: ') }}</div>
+                <div class="col-12 d-flex flex-row-reverse">
+                    <button type="button" class="btn btn-primary btn-sm">
+                        <span class="badge bg-secondary">{{ number_format($profile->have_liked_comment_avg_stars) }}</span>
+                        <span class="fa fa-star" @if(number_format($profile->have_liked_comment_avg_stars) >= 1) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->have_liked_comment_avg_stars) >= 2) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->have_liked_comment_avg_stars) >= 3) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->have_liked_comment_avg_stars) >= 4) style="color:orange" @endif></span>
+                        <span class="fa fa-star" @if(number_format($profile->have_liked_comment_avg_stars) == 5) style="color:orange" @endif></span> {{ __('Votes') }} <span class="badge bg-secondary">{{ $profile->have_liked_comment_count }}</span>
+                    </button>
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="mb-3 w-75">
+        <div class="card-body p-0">
+          <div class="row">
             <div class="col-6"><h6>{{ __('Les postes') }} <span class="badge bg-secondary">{{ $profile->posts_count }}</span></h6></div>
             @if($profile->id == auth()->id())
             <div class="col-6 d-flex flex-row-reverse">
-              <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalmakecomment">
+              <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalmakepost">
                 {{ __('Créér un post') }}
               </button>
             </div>
@@ -51,7 +115,6 @@
           </div>
         </div>
     </div>
-    <?php //print_r(App\Http\Controllers\MyFunc\Myfunc::timeDifferent("2021-10-06 14:20:58")); ?>
     @foreach($posts as $post)
       <div class="card mb-3 w-75 posts"  id="post-{{ $post->id }}">
           <div class="card-body">
@@ -99,7 +162,7 @@
                       <span class="btn-voted" style="color: gray;font-weight: bold;font-size: 12px;">@if($voted) {{ __('Voted') }} @endif</span>
                   </div>
                   <div class="col-6 d-flex flex-row-reverse">
-                      <button type="button" class="btn btn-primary btn-sm" onclick="comments({{ $post->id }})" data-bs-toggle="modal" data-bs-target="#modalcommentes"> {{ __('Commentes') }} <span class="badge bg-secondary">{{ $post->comments_count }}</span> </button>
+                      <button type="button" class="btn btn-primary btn-sm" onclick="comments({{ $post->id }})" data-bs-toggle="modal" data-bs-target="#modalcommentes"> {{ __('Commentes') }} <span class="badge bg-secondary comment-count">{{ $post->comments_count }}</span> </button>
                   </div>
               </div>
           </div>

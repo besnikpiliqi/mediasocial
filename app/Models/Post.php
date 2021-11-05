@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Comment;
 use App\Models\LikePost;
 use App\Models\LikeComment;
+use App\Models\Photo;
 
 use App\Casts\PostCasts;
 
@@ -37,8 +38,12 @@ class Post extends Model
     // {
     //     return Hash::make($value);
     // }
+    // protected $guarded = [];
     
-
+    // public function image()
+    // {
+    //     return $this->morphOne(Photo::class, 'imageable');
+    // }
     public function user()
     {
         return $this->belongsTo(User::class);

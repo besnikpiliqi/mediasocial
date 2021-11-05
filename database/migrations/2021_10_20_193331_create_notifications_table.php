@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHistorysTable extends Migration
+class CreateNotificationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateHistorysTable extends Migration
      */
     public function up()
     {
-        Schema::create('historys', function (Blueprint $table) {
+        Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
@@ -25,7 +25,7 @@ class CreateHistorysTable extends Migration
             $table->foreign('post_id')->references('id')->on('posts')->onUpdate('cascade')->onDelete('cascade');
             $table->unsignedBigInteger('comment_id')->nullable();
             $table->foreign('comment_id')->references('id')->on('comments')->onUpdate('cascade')->onDelete('cascade');
-            $table->enum('action', ['followed','commented','post.voted','comment.voted']);
+            $table->enum('action', ['following','followed','commented','post.voted','comment.voted']);
             $table->integer('stars')->nullable()->unsigned();
             $table->integer('viewed')->default(1)->unsigned();
             $table->timestamps();
@@ -39,6 +39,6 @@ class CreateHistorysTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('historys');
+        Schema::dropIfExists('notifications');
     }
 }

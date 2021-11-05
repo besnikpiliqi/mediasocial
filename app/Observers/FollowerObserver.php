@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Follower;
-use App\Models\History;
+use App\Models\Notification;
 
 class FollowerObserver
 {
@@ -15,7 +15,7 @@ class FollowerObserver
      */
     public function created(Follower $follower)
     {
-        History::create(['user_id'=>$follower->follow_id,'action_user_id'=>$follower->user_id,'follow_id'=>$follower->user_id,'action'=>'followed']);
+        Notification::create(['user_id'=>$follower->follow_id,'action_user_id'=>$follower->user_id,'follow_id'=>$follower->user_id,'action'=>'followed']);
     }
 
     /**

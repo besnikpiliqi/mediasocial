@@ -9,11 +9,11 @@ use App\Models\User;
 use App\Models\Post;
 use App\Models\Comment;
 
-class History extends Model
+class Notification extends Model
 {
     use HasFactory;
 
-    protected $table = 'historys';
+    protected $table = 'notifications';
 
     protected $primaryKey = 'id';
     public $incrementing = false;
@@ -33,14 +33,7 @@ class History extends Model
         'stars',
     ];
     
-    // public function scopefirstOrUpdate($query,array $attributes, array $values = array()){
-    //     $instance = $query->where($attributes)->first();
-    //     if($instance){
-    //         $instance->update($values)->save();
-    //     }else{
-    //         $query->create()
-    //     }
-    // }
+    
     public function post()
     {
         return $this->belongsTo(Post::class)->select(['id','content']);

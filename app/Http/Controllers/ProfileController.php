@@ -45,6 +45,14 @@ class ProfileController extends Controller
                         ->with('city')
                         ->with('city.country')
                         ->withCount('posts')
+                        ->withAvg('haveLikedPost','stars')
+                        ->withAvg('likesPost','stars')
+                        ->withAvg('haveLikedComment','stars')
+                        ->withAvg('likesComment','stars')
+                        ->withCount('haveLikedPost')
+                        ->withCount('likesPost')
+                        ->withCount('haveLikedComment')
+                        ->withCount('likesComment')
                         ->where('id',$user->id)
                         ->first();
         $posts = tap($user->posts()
@@ -115,43 +123,38 @@ class ProfileController extends Controller
         return response()->json(['citys' => $citys]);
     }
 
-    public function followed($user_id){
-        $follows = Follower::where('follow_id',$user_id)->with(['userFollowed'])->get();
+    public function followed(Request $request){
+        $follows = Follower::where('follow_id',$request->id)->with(['userFollowed'])->get();
         return response()->json($follows);
     }
 
-    public function following($user_id){
-        $follows = Follower::where('user_id',$user_id)->with(['userFollowing'])->get();
+    public function following(Request $request){
+        $follows = Follower::where('user_id',$request->id)->with(['userFollowing'])->get();
         return response()->json($follows);
     }
 
     public function unfollow(Request $request){
-        $follower = Follower::where(['user_id'=>auth()->id(),'follow_id'=>$request->get('follow_id')])->first();
-        // return response()->json(['success'=>$follower]);
-        if($follower && $follower->delete()){
-            $remFoll = Follower::where(['follow_id'=>auth()->id(),'user_id'=>$request->get('follow_id')])->first();
-            if($remFoll){
-                $remFoll->delete();// the user delete already the user that he is followed by this user!
-            }
-            return response()->json(['success'=>true]);
+        $follow_id = $request->get('follow_id');
+        $follow = Follower::where(function ($query) use ($follow_id) {
+            $query->where(['user_id' => $follow_id, 'follow_id' => auth()->id() ]);
+        })
+        ->orwhere(function ($query) use ($follow_id) {
+            $query->where(['follow_id' => $follow_id, 'user_id' => auth()->id() ]);
+        });
+
+        if($follow->delete()){
+            return response()->json(true);
         }else{
-            return response()->json(['success'=>false]);
+            return response()->json(false);
         }
     }
-    public function cancelfollow(Request $request){
-        $follower = Follower::where(['follow_id'=>auth()->id(),'user_id'=>$request->get('follow_id')])->first();
-        if($follower && $follower->delete()){
-            return response()->json(['success'=>true]);
-        }else{
-            return response()->json(['success'=>false]);
-        }
-    }
+    
     public function follow(Request $request){
         $follow = Follower::firstOrCreate(['user_id' => auth()->id(), 'follow_id' => $request->get('follow_id')]);
         if($follow){
-            return response()->json(['success'=>true]);
+            return response()->json(true);
         }else{
-            return response()->json(['success'=>false]);
+            return response()->json(false);
         }
         /**
          * History create or update it will be on the observer FollowerObserver.php

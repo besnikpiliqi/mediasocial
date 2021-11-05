@@ -41,6 +41,13 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('delete-comment', function (User $user,Comment $comment) {
             return $user->id === $comment->user_id;
         });
+        Gate::define('edit-comment', function (User $user,Comment $comment) {
+            return $user->id === $comment->user_id;
+        });
+
+        Gate::define('unfollow', function (User $user,Follower $folllow) {
+            return $user->id === $folllow->follow_id;
+        });
 
         
         

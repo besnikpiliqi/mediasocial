@@ -7,7 +7,7 @@
           <div class="row">
             <div class="col-sm-6 col-md-6">{{ __('Actualités') }}</div>
             <div class="col-6 col-md-6 d-flex flex-row-reverse">
-              <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalmakecomment">
+              <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalmakepost">
                 {{ __('Créér un post') }}
               </button>
             </div>
@@ -58,7 +58,7 @@
                         <span class="btn-voted" style="color: gray;font-weight: bold;font-size: 12px;">@if($voted) {{ __('Voted') }} @endif</span>
                     </div>
                     <div class="col-6 d-flex flex-row-reverse">
-                        <button type="button" class="btn btn-primary btn-sm" onclick="comments({{ $post->id }})" data-bs-toggle="modal" data-bs-target="#modalcommentes"> {{ __('Commentes') }} <span class="badge bg-secondary">{{ $post->comments_count }}</span> </button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="comments({{ $post->id }})" data-bs-toggle="modal" data-bs-target="#modalcommentes"> {{ __('Commentes') }} <span class="badge bg-secondary comment-count">{{ $post->comments_count }}</span> </button>
                     </div>
                 </div>
             </div>

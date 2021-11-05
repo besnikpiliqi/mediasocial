@@ -4,7 +4,7 @@ namespace App\Observers;
 
 use App\Models\LikePost;
 use App\Models\Post;
-use App\Models\History;
+use App\Models\Notification;
 
 class LikePostObserver
 {
@@ -17,7 +17,7 @@ class LikePostObserver
     public function created(LikePost $likePost)
     {
         $post = Post::find($likePost->post_id)->first();
-        History::create(
+        Notification::create(
             ['user_id'=>$post->user_id,
             'action_user_id'=>auth()->id(),
             'post_id'=>$likePost->post_id,
@@ -35,7 +35,7 @@ class LikePostObserver
     public function updated(LikePost $likePost)
     {
         $post = Post::find($likePost->post_id)->first();
-        History::where(['user_id'=>$post->user_id,'action_user_id'=>auth()->id(),'post_id'=>$likePost->post_id,'action'=>'post.voted'])
+        Notification::where(['user_id'=>$post->user_id,'action_user_id'=>auth()->id(),'post_id'=>$likePost->post_id,'action'=>'post.voted'])
         ->update(['stars'=>$likePost->stars,'viewed'=>1]);
     }
 

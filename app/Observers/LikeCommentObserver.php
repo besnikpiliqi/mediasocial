@@ -4,7 +4,7 @@ namespace App\Observers;
 
 use App\Models\LikeComment;
 use App\Models\Post;
-use App\Models\History;
+use App\Models\Notification;
 
 class LikeCommentObserver
 {
@@ -17,7 +17,7 @@ class LikeCommentObserver
     public function created(LikeComment $likeComment)
     {
         $post = Post::find($likeComment->post_id)->first();
-        History::updateOrInsert(
+        Notification::updateOrInsert(
             ['user_id'=>$post->user_id,'action_user_id'=>auth()->id(),'comment_id'=>$likeComment->comment_id,'action'=>'comment.voted'],
             ['stars'=>$likeComment->stars,'viewed'=>1]
         );
@@ -32,7 +32,7 @@ class LikeCommentObserver
     public function updated(LikeComment $likeComment)
     {
         $post = Post::find($likeComment->post_id)->first();
-        History::updateOrCreate(
+        Notification::updateOrCreate(
             ['user_id'=>$post->user_id,'action_user_id'=>auth()->id(),'comment_id'=>$likeComment->comment_id,'action'=>'comment.voted'],
             ['stars'=>$likeComment->stars,'viewed'=>1]
         );
