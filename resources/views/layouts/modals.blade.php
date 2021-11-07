@@ -10,31 +10,54 @@
         
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary abonnes" data-bs-dismiss="modal">{{ __('Fermer') }}</button>
+        <button type="button" class="btn btn-secondary abonnes" data-bs-dismiss="modal" aria-label="Close">{{ __('Fermer') }}</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal post étoiles class="modal fade" id="modaletoilespost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" -->
-<div class="modal fade show" id="modaletoilespost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: block; padding-left: 0px;" aria-modal="true" role="dialog">
+<!-- Modal post étoiles class="modal fade show" id="modaletoilespost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: block; padding-left: 0px;" aria-modal="true" role="dialog" -->
+<div class="modal fade" id="modaletoilespost" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      
+    
       <div class="modal-header">
         <h5 class="modal-title" id="staticBackdropLabel">{{ __('Votez le post') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body post-stars d-flex justify-content-center">
+      <div class="modal-body post-stars">
+        <div class="d-flex justify-content-center loading-stars" style="position: absolute;width: 94%;height: 88%;background-color: white;z-index: 1;">
+          <span class="d-flex justify-content-center" style="margin: auto;">
+            <div class="lds-ring">
+              <div></div><div></div><div></div><div></div>
+            </div>
+          </span>
+        </div>
+          <div class="col-12 ratings-stars-post">
+            @for($i = 0;$i < 5;$i++)
+              <div class="col-12 d-flex justify-content-center">
+                <ul class="ratings stars-{{ $i }}">
+                  <li class="star active @if($i == 0) selected @endif"></li>
+                  <li class="star active @if($i == 1) selected @endif"></li>
+                  <li class="star active @if($i == 2) selected @endif"></li>
+                  <li class="star active @if($i == 3) selected @endif"></li>
+                  <li class="star active @if($i == 4) selected @endif"></li>
+                </ul>
+                <span class="num-stars-ratings"><b>0</b></span>
+              </div>
+            @endfor
+          </div>
+          <div class="col-12 d-flex justify-content-center body-vote-post">
           <input type="hidden" name="vote-post" value="0" class="vote-stars-post">
           <input type="hidden" name="id-post" value="" class="id-post">
           <ul class="ratings">
-            <li class="star" onclick="stars(this)" data-star="5"></li>
-            <li class="star" onclick="stars(this)" data-star="4"></li>
-            <li class="star" onclick="stars(this)" data-star="3"></li>
-            <li class="star" onclick="stars(this)" data-star="2"></li>
-            <li class="star" onclick="stars(this)" data-star="1"></li>
-          </ul>
+                <li class="star" onclick="stars(this)" data-star="5"></li>
+                <li class="star" onclick="stars(this)" data-star="4"></li>
+                <li class="star" onclick="stars(this)" data-star="3"></li>
+                <li class="star" onclick="stars(this)" data-star="2"></li>
+                <li class="star" onclick="stars(this)" data-star="1"></li>
+              </ul>
+          </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary vote-post">{{ __('Voter') }}</button>
@@ -230,6 +253,47 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary abonnes" data-bs-dismiss="modal">{{ __('Fermer') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- commportement -->
+<div class="modal fade" id="modalcomportement" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="comportement" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h5 class="modal-title" id="comportement">
+          <!-- the text action -->
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body comportement-stars">
+        <div class="d-flex justify-content-center loading-stars" style="position: absolute;width: 94%;height: 88%;background-color: white;z-index: 1;">
+          <span class="d-flex justify-content-center" style="margin: auto;">
+            <div class="lds-ring">
+              <div></div><div></div><div></div><div></div>
+            </div>
+          </span>
+        </div>
+          <div class="col-12 ratings-stars-post">
+            @for($i = 0;$i < 5;$i++)
+              <div class="col-12 d-flex justify-content-center">
+                <ul class="ratings stars-comportement-{{ $i }}">
+                  <li class="star active @if($i == 0) selected @endif"></li>
+                  <li class="star active @if($i == 1) selected @endif"></li>
+                  <li class="star active @if($i == 2) selected @endif"></li>
+                  <li class="star active @if($i == 3) selected @endif"></li>
+                  <li class="star active @if($i == 4) selected @endif"></li>
+                </ul>
+                <span class="num-stars-ratings"><b>0</b></span>
+              </div>
+            @endfor
+          </div>
+          
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" aria-label="Close">{{ __('Fermer') }}</button>
       </div>
     </div>
   </div>

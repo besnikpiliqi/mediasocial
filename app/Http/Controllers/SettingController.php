@@ -47,6 +47,7 @@ class SettingController extends Controller
     public function notification(){
         auth()->user()->notifications()->update(['viewed'=>0]);
         $notifications = auth()->user()->notifications()
+        // $notificationsCount = $notifications;
         // $notifications->update(['viewed'=>0]);
         // $notifications->refresh();
         ->take(10)

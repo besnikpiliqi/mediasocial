@@ -139,7 +139,7 @@ function rowComments(comment){
 }
 
 function stars(cette){
-    $('.selected').removeClass('selected');
+    $('.selected:not(.active)').removeClass('selected');
     
     var stars = $(cette).attr('data-star');
 
@@ -195,7 +195,7 @@ $("form#new-post").on("submit",function(e){
         cache: false,
         processData:false,
         beforeSend : function(){
-            $('button.new-post').html('En publiant..');
+            $('button.new-post').attr('disabled','disabled').html('En publiant..');
         },
         success: function(data) {
             console.log(data)
@@ -204,12 +204,13 @@ $("form#new-post").on("submit",function(e){
                 // imgPost.find('img').attr('src',imgPostEdited.attr('src'));
                 $('button.btn-close').trigger('click');
             }else{
-                $('button.new-post').html('Publier');
                 alert("Il y avait un problème!");
             }
+            $('button.new-post').removeAttr('disabled').html('Publier');
         },
         error : function(data){
             console.log(data)
+            $('button.new-post').removeAttr('disabled').html('Publier');
             alert("Il y avait un problème!");
         },
 
@@ -235,7 +236,7 @@ $("form#edit-post").on("submit",function(e){
         cache: false,
         processData:false,
         beforeSend : function(){
-            $('button.update-post').html('En modifiant..');
+            $('button.update-post').attr('disabled','disabled').html('En modifiant..');
         },
         success: function(data) {
             console.log(data)
@@ -246,9 +247,11 @@ $("form#edit-post").on("submit",function(e){
             }else{
                 alert("Il y avait un problème!");
             }
+            $('button.update-post').removeAttr('disabled').html('Publier');
         },
         error : function(data){
             console.log(data)
+            $('button.update-post').removeAttr('disabled').html('Publier');
             alert("Il y avait un problème!");
         },
 
@@ -262,6 +265,7 @@ $("form#new-comment").on("submit",function(e){
         alert("Ecrivez vote commentaire!");
         return
     }
+    
     var post_id = Number($("input.new-comment").val());
     $.ajax({
         url: '/new-comment',
@@ -273,7 +277,7 @@ $("form#new-comment").on("submit",function(e){
         cache: false,
         processData:false,
         beforeSend : function(){
-            $('button.new-comment').html('En publiant..');
+            $('button.new-comment').attr('disabled','disabled').html('En publiant..');
         },
         success: function(data) {
             console.log(data)
@@ -282,14 +286,14 @@ $("form#new-comment").on("submit",function(e){
                 const numComments = $(`#post-${post_id}`).find('.badge.comment-count');
                 numComments.html(Number(numComments.html()) + 1); 
                 $('span.return-to-comment').trigger('click');
-                $('button.new-comment').html('Publier');
             }else{
-                $('button.new-comment').html('Publier');
                 alert("Il y avait un problème!");
             }
+            $('button.new-comment').removeAttr('disabled').html('Publier');
         },
         error : function(data){
             console.log(data)
+            $('button.new-comment').removeAttr('disabled').html('Publier');
             alert("Il y avait un problème!");
         },
 
@@ -297,7 +301,7 @@ $("form#new-comment").on("submit",function(e){
 });
 $("form#edit-comment").on("submit",function(e){
     e.preventDefault();
-    $('#modaleditcomment  button.edit-comment').attr('disabled','disabled').html('En modifiant..');
+    
     var posts = $('div.posts');
     var _token = $('meta[name="csrf-token"]').attr('content');
     var newContent = $('#modaleditcomment textarea#edit-comment').val();
@@ -308,6 +312,7 @@ $("form#edit-comment").on("submit",function(e){
         alert("Ecrivez vote commentaire!");
         return
     }
+    $('#modaleditcomment  button.edit-comment').attr('disabled','disabled').html('En modifiant..');
     var data = $.ajaxPost('/edit-comment/'+comment_id,{content:newContent});
     if(data){
         bodyComment.find('.card-text.content').html(newContent);
@@ -324,7 +329,7 @@ function moreNotification(cette){
     var content = '';
     if(!$.isEmptyObject(data)){
         offsetmoreNotification += 10;
-        $(cette).attr('onclick','moreNotification(this)').html('<button class="btn btn-primary btn-sm">Plus</button>');
+        $(cette).attr('onclick','moreNotification(this)').removeAttr('disabled').html('<button class="btn btn-primary btn-sm">Plus</button>');
         for (let i = 0; i < data.length; i++) {
             const element = data[i];
             content += '<div class="col-12 mb-3 p-4 border border-info rounded d-flex">'+
@@ -625,9 +630,11 @@ function avgComment(likes){
 }
 
 function starsPost(post_id){
+    $('.loading-stars').removeClass('d-none');
     bodyPostStars.find('.id-post').val(post_id);
     bodyPostStars.find('.vote-stars-post').val(0);
-    bodyPostStars.find('ul.ratings li.star').removeClass('selected');
+    bodyPostStars.find('ul.ratings li.star:not(.active)').removeClass('selected');
+    $(".ratings-stars-post .num-stars-ratings b").html(0);
     bodyPostStars.next().find('.vote-post').html('Voter');
     var bodyVote = $(".modal-body.post-stars");
     $.ajax({
@@ -636,26 +643,51 @@ function starsPost(post_id){
         type:'get',
         data:{post_id:post_id},
         success: function(data) {
-            console.log(data.stars)
-            if(!$.isEmptyObject(data)){
-                var content = '<input type="hidden" name="vote-post" value="'+data.stars+'" class="vote-stars-post">'+
+            console.log(data.postVoted)
+            if(data.postVoted){
+                var star = '<input type="hidden" name="vote-post" value="'+data.postVoted+'" class="vote-stars-post">'+
                                 '<input type="hidden" name="id-post" value="'+post_id+'" class="id-post"></input>'+
                                 '<ul class="ratings">'+
-                                    '<li class="star '+(data.stars == 5 ? 'selected': '')+'" onclick="stars(this)" data-star="5"></li>'+
-                                    '<li class="star '+(data.stars == 4 ? 'selected': '')+'" onclick="stars(this)" data-star="4"></li>'+
-                                    '<li class="star '+(data.stars == 3 ? 'selected': '')+'" onclick="stars(this)" data-star="3"></li>'+
-                                    '<li class="star '+(data.stars == 2 ? 'selected': '')+'" onclick="stars(this)" data-star="2"></li>'+
-                                    '<li class="star '+(data.stars == 1 ? 'selected': '')+'" onclick="stars(this)" data-star="1"></li>'+
+                                    '<li class="star '+(data.postVoted == 5 ? 'selected': '')+'" onclick="stars(this)" data-star="5"></li>'+
+                                    '<li class="star '+(data.postVoted == 4 ? 'selected': '')+'" onclick="stars(this)" data-star="4"></li>'+
+                                    '<li class="star '+(data.postVoted == 3 ? 'selected': '')+'" onclick="stars(this)" data-star="3"></li>'+
+                                    '<li class="star '+(data.postVoted == 2 ? 'selected': '')+'" onclick="stars(this)" data-star="2"></li>'+
+                                    '<li class="star '+(data.postVoted == 1 ? 'selected': '')+'" onclick="stars(this)" data-star="1"></li>'+
                                 '</ul>';
-                 bodyVote.html(content);
-                bodyPostStars.next().find('.vote-post').html('Voted');
+                 bodyVote.find('.body-vote-post').html(star);
+                 bodyPostStars.next().find('.vote-post').html('Voted');
             }
+            $('.loading-stars').addClass('d-none');
+            console.log(data.starsPost)
+            for (let i = 0; i < data.starsPost.length; i++) {
+                const element = data.starsPost[i];
+                console.log(element)
+                bodyVote.find(`.ratings.stars-${i}`).next().find('b').html(element.stars);
+            }
+                
+            
         },
         error : function(data){
             alert('Il y avait un problème!');
         },
     });
 }
+ function openComportStars(user_id,text){
+    $(`#modalcomportement .modal-title`).html(text);
+    $('.loading-stars').removeClass('d-none');
+    var data = $.ajaxGet('/comportement',{user_id:user_id,action:text});
+    if(!$.isEmptyObject(data)){
+        for (let i = 0; i < data.starsPost.length; i++) {
+            const element = data.starsPost[i];
+            console.log(element)
+            $(`#modalcomportement .ratings.stars-comportement-${i}`).next().find('b').html(element.stars);
+        }
+        $('.loading-stars').addClass('d-none');
+    }else{
+        alert('Il y avait un problème!');
+    }
+    
+ }
 
 function starsComment(comment_id){
     bodyCommentStars.find('.id-comment').val(comment_id);

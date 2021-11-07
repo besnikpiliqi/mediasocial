@@ -66,30 +66,30 @@ class HomeController extends Controller
                });
             //    $token = request()->user()->currentAccessToken()->plainTextToken;
         
-            $posts = $user
-                    ->withAvg('haveLikedPost','stars')
-                    ->withAvg('likesPost','stars')
-                    ->withAvg('haveLikedComment','stars')
-                    ->withAvg('likesComment','stars')
-                    ->withCount('haveLikedPost')
-                    ->withCount('likesPost')
-                    ->withCount('haveLikedComment')
-                    ->withCount('likesComment')
-                    ->get();
-                    $id1 = 5;
-                    $id2 = 1;
-               $followed = Follower::where(function ($query) use ($id1,$id2) {
-                    $query->where(['user_id'=> $id2,'follow_id'=>$id1]);
-                })
-                ->orwhere(function ($query) use ($id1,$id2) {
-                    $query->where(['follow_id'=> $id2,'user_id'=>$id1]);
-                })->get();
+            // $posts = $user
+            //         ->withAvg('haveLikedPost','stars')
+            //         ->withAvg('likesPost','stars')
+            //         ->withAvg('haveLikedComment','stars')
+            //         ->withAvg('likesComment','stars')
+            //         ->withCount('haveLikedPost')
+            //         ->withCount('likesPost')
+            //         ->withCount('haveLikedComment')
+            //         ->withCount('likesComment')
+            //         ->get();
+                    // $id1 = 5;
+                    // $id2 = 1;
+            //    $followed = Follower::where(function ($query) use ($id1,$id2) {
+            //         $query->where(['user_id'=> $id2,'follow_id'=>$id1]);
+            //     })
+            //     ->orwhere(function ($query) use ($id1,$id2) {
+            //         $query->where(['follow_id'=> $id2,'user_id'=>$id1]);
+            //     })->get();
         // $post = Follower::whereIn('follow_id',$user->followed()->pluck('follow_id'))->with('userFollowed')->get();// kshtu per mi kqyr kush te ka ba follow e hala sja ke kthy
         // $followed = $user->followed()->pluck('user_id');
         // $followingNotAcceptedByOthers = $user->following()->whereNotIn('follow_id',$user->followed()->pluck('user_id'))->with('userFollowing')->get();
         // $followedNotAcceptedByMe = $user->followed()->whereNotIn('user_id',$user->following()->pluck('follow_id'))->with('userFollowed')->get();
         // // Follower::whereNotIn('user_id',$user->followed()->pluck('follow_id'))->with('userFollowing')->get();// kshtu per mi kqyr kush te ka ba follow e hala sja ke kthy
-        return response()->json(["posts" => $followed]);
+        // return response()->json(["posts" => $posts]);
         
         return view('home', ["posts" => $posts]);
     }
@@ -122,8 +122,22 @@ class HomeController extends Controller
     
 
     public function checkVotePost($post_id){
-        $postVoted = LikePost::where(['user_id'=>auth()->id(),'post_id'=>$post_id])->first();
-        return response()->json($postVoted);
+        // $postVoted = LikePost::selectRaw('SUM(stars) as stars,stars as star')->where(['post_id'=>$post_id])->groupBy('stars')->get();
+        $postVoted = 0;
+        $starsPostArr = [['stars'=>0,'star'=>1],['stars'=>0,'star'=>2],['stars'=>0,'star'=>3],['stars'=>0,'star'=>4],['stars'=>0,'star'=>5] ];
+        try {
+            $starsPost = Post::find($post_id)->likes();
+            $postVoted = $starsPost->clone()->where('user_id',auth()->id())->pluck('stars')->first() ?? 0;
+            $starsPost = $starsPost->selectRaw('COUNT(stars) as stars,stars as star')->groupBy('stars')->get();
+            foreach ($starsPost as $value) {
+                $starsPostArr[$value->star - 1] = $value;
+            }
+            
+        } catch (\Throwable $th) {
+            // return response()->json(['postVoted'=>$postVoted,'starsPost'=>$starsPostArr]);
+        }
+        return response()->json(['postVoted'=>$postVoted,'starsPost'=>array_reverse($starsPostArr)]);
+        
     }
 
     public function votePost(Request $request){

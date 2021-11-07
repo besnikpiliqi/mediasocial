@@ -11,6 +11,7 @@ use App\Models\Country;
 use App\Models\City;
 use App\Models\History;
 
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\MyFunc\MyFunc;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
@@ -65,6 +66,33 @@ class ProfileController extends Controller
         });
         // return response()->json(['profile' => $profile,'posts' => $posts]);
         return view('profile', ["profile" => $profile, "posts" => $posts]);
+    }
+    public function checkTheComportemnt(Request $request){
+        $user = User::where('id',$request->user_id)
+                    ->withAvg('haveLikedComment','stars')
+                    ->withAvg('haveLikedPost','stars')
+                    ->get();
+        return response()->json($user);
+    }
+    public function comportementUser(Request $request){
+        $stars = [['stars'=>0,'star'=>1],['stars'=>0,'star'=>2],['stars'=>0,'star'=>3],['stars'=>0,'star'=>4],['stars'=>0,'star'=>5] ];
+
+        if($request->action == 'Des votes dans ses commentaires'){
+            $action = 'haveLikedComment';
+        }elseif($request->action == 'Des votes dans ses publicatioons'){
+            $action = 'haveLikedPost';
+        }elseif($request->action == 'Ses votes dans des commentaires'){
+            $action = 'likesComment';
+        }elseif($request->action == 'Ses votes dans des publications'){
+            $action = 'likesPost';
+        }else{
+            return response()->json(false);
+        }
+        $user = User::find($request->user_id)->$action()->get();
+        foreach ($user as $value) {
+            $stars[$value->stars - 1]['stars']++;
+        }
+        return response()->json(['starsPost'=>array_reverse($stars)]);
     }
     public function edit()
     {

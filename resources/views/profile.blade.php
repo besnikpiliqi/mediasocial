@@ -41,9 +41,9 @@
         <div class="card-body p-0">
           <div class="row">
             <div class="col-6">
-                <div class="col-12">{{ __('Ses votes dans des publicatioons: ') }}</div>
+                <div class="col-12">{{ __('Ses votes dans des publications: ') }}</div>
                 <div class="col-12">
-                    <button type="button" class="btn btn-primary btn-sm">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalcomportement" onclick="openComportStars({{ $profile->id }},'Ses votes dans des publications')">
                         <span class="badge bg-secondary">{{ number_format($profile->likes_post_avg_stars) }}</span>
                         <span class="fa fa-star" @if(number_format($profile->likes_post_avg_stars) >= 1) style="color:orange" @endif></span>
                         <span class="fa fa-star" @if(number_format($profile->likes_post_avg_stars) >= 2) style="color:orange" @endif></span>
@@ -56,7 +56,7 @@
             <div class="col-6">
             <div class="col-12 d-flex flex-row-reverse">{{ __('Ses votes dans des commentaires: ') }}</div>
                 <div class="col-12 d-flex flex-row-reverse">
-                    <button type="button" class="btn btn-primary btn-sm">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalcomportement" onclick="openComportStars({{ $profile->id }},'Ses votes dans des commentaires')">
                         <span class="badge bg-secondary">{{ number_format($profile->likes_comment_avg_stars) }}</span>
                         <span class="fa fa-star" @if(number_format($profile->likes_comment_avg_stars) >= 1) style="color:orange" @endif></span>
                         <span class="fa fa-star" @if(number_format($profile->likes_comment_avg_stars) >= 2) style="color:orange" @endif></span>
@@ -75,7 +75,7 @@
             <div class="col-6">
                 <div class="col-12">{{ __('Des votes dans ses publicatioons: ') }}</div>
                 <div class="col-12">
-                    <button type="button" class="btn btn-primary btn-sm">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalcomportement" onclick="openComportStars({{ $profile->id }},'Des votes dans ses publicatioons')">
                         <span class="badge bg-secondary">{{ number_format($profile->have_liked_post_avg_stars) }}</span>
                         <span class="fa fa-star" @if(number_format($profile->have_liked_post_avg_stars) >= 1) style="color:orange" @endif></span>
                         <span class="fa fa-star" @if(number_format($profile->have_liked_post_avg_stars) >= 2) style="color:orange" @endif></span>
@@ -88,7 +88,7 @@
             <div class="col-6">
             <div class="col-12 d-flex flex-row-reverse">{{ __('Des votes dans ses commentaires: ') }}</div>
                 <div class="col-12 d-flex flex-row-reverse">
-                    <button type="button" class="btn btn-primary btn-sm">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalcomportement" onclick="openComportStars({{ $profile->id }},'Des votes dans ses commentaires')">
                         <span class="badge bg-secondary">{{ number_format($profile->have_liked_comment_avg_stars) }}</span>
                         <span class="fa fa-star" @if(number_format($profile->have_liked_comment_avg_stars) >= 1) style="color:orange" @endif></span>
                         <span class="fa fa-star" @if(number_format($profile->have_liked_comment_avg_stars) >= 2) style="color:orange" @endif></span>

@@ -57,6 +57,8 @@ Route::group(['middleware'=> ['auth','verified'] ],function(){
     });
     
 
+    Route::get('/comportement', [App\Http\Controllers\ProfileController::class, 'comportementUser'])->name('comportement');
+    Route::get('/checkcomportement', [App\Http\Controllers\ProfileController::class, 'checkTheComportemnt'])->name('checkcomportement');
     Route::get('/edit-profile', [App\Http\Controllers\ProfileController::class, 'edit'])->middleware('password.confirm')->name('edit-profile');
     Route::post('/edit-profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('edit-profile');
     
