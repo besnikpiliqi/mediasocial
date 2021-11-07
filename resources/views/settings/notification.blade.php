@@ -17,5 +17,7 @@
     @endforeach
     </div>
 </div>
+@if($notificationCount > 10)
 <div class="col-12 text-center" onclick="moreNotification(this);"><button class="btn btn-primary btn-sm">{{ __('Plus') }}</button></div>
+@endif
 @endsection

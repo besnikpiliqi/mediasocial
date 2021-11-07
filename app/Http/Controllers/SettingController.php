@@ -45,7 +45,9 @@ class SettingController extends Controller
         return auth()->user()->notifications()->where('viewed',1)->count();
     }
     public function notification(){
-        auth()->user()->notifications()->update(['viewed'=>0]);
+        $notificationSet = auth()->user()->notifications();
+        $notificationCount = $notificationSet->count();
+        $notificationSet->update(['viewed'=>0]);
         $notifications = auth()->user()->notifications()
         // $notificationsCount = $notifications;
         // $notifications->update(['viewed'=>0]);
@@ -61,7 +63,7 @@ class SettingController extends Controller
         });
         
         // return response()->json($notifications);
-        return view('settings.notification',['notifications'=>$notifications]);
+        return view('settings.notification',['notifications'=>$notifications,'notificationCount'=>$notificationCount]);
     }
 
     public function request(){
